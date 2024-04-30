@@ -1,0 +1,60 @@
+# ===================================================================
+# Copyright 2024 ZhengPu Shi
+#  This file is part of FunMatrix. It is distributed under the MIT
+#  "expat license". You should have recieved a LICENSE file with it.
+# ===================================================================
+
+-R ./FunMatrix FunMatrix
+
+-arg -w -arg -notation-overridden
+-arg -w -arg -hiding-delimiting-key
+# -arg -w -arg -deprecated-hint-without-locality
+# -arg -w -arg -redundant-canonical-projection
+# -arg -w -arg -ambiguous-paths
+# -arg -w -arg -local-declaration
+# -arg -w -arg -future-coercion-class-field
+# -arg -w -arg -extraction-logical-axiom
+
+# ========== CoqExt ====================
+FunMatrix/CoqExt/Basic.v
+FunMatrix/CoqExt/BoolExt.v
+FunMatrix/CoqExt/StrExt.v
+FunMatrix/CoqExt/TupleExt.v
+FunMatrix/CoqExt/HierarchySetoid.v
+FunMatrix/CoqExt/NatExt.v
+FunMatrix/CoqExt/PositiveExt.v
+FunMatrix/CoqExt/ZExt.v
+FunMatrix/CoqExt/QExt.v
+FunMatrix/CoqExt/QcExt.v
+FunMatrix/CoqExt/RExt.v
+FunMatrix/CoqExt/Ratan2.v
+FunMatrix/CoqExt/RFunExt.v
+FunMatrix/CoqExt/RAnalysisExt.v
+FunMatrix/CoqExt/Complex.v
+FunMatrix/CoqExt/SetoidListExt.v
+FunMatrix/CoqExt/LinearSpace.v
+FunMatrix/CoqExt/MyExtrOCamlR.v
+
+# ========== Matrix ====================
+FunMatrix/Matrix/Fin.v
+FunMatrix/Matrix/Sequence.v
+FunMatrix/Matrix/Vector.v
+FunMatrix/Matrix/Matrix.v
+FunMatrix/Matrix/Permutation.v
+FunMatrix/Matrix/MatrixDet.v
+FunMatrix/Matrix/MatrixGauss.v
+FunMatrix/Matrix/MatrixInvBase.v
+FunMatrix/Matrix/MatrixInvAM.v
+FunMatrix/Matrix/MatrixInvGE.v
+FunMatrix/Matrix/MatrixInv.v
+FunMatrix/Matrix/MatrixOrth.v
+FunMatrix/Matrix/ElementType.v
+FunMatrix/Matrix/MatrixModule.v
+FunMatrix/Matrix/MatrixNat.v
+FunMatrix/Matrix/MatrixZ.v
+FunMatrix/Matrix/MatrixQ.v
+FunMatrix/Matrix/MatrixQc.v
+FunMatrix/Matrix/MatrixR.v
+FunMatrix/Matrix/MatrixC.v
+FunMatrix/Matrix/MatrixRFun.v
+# FunMatrix/Matrix/VectorSpace.v
