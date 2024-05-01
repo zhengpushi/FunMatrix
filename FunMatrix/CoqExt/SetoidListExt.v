@@ -260,60 +260,41 @@ Section fold_left.
       (fold_left Aadd l (a + b) == (fold_left Aadd l a) + b)%A.
   Proof.
     induction l; intros; simpl; try easy.
-    assert (a0 + b + a == a0 + a + b)%A. elimh1.
-
-    pose proof (amonoidMonoid). ?
-      (match goal with
-       | AM:AMonoid ?f ?e ?E
-         |- _ =>
-           (* idtac f *)
-           try pose proof (@amonoidMonoid _ f e AM) as HMonoid
-           (* ; try monoid; *)
-           (* try pose proof (@amonoidASGroup _ f e AM) as HASGroup; asgroup *)
-       (* | M:Monoid ?f ?e ?E |- _ => monoid *)
-       (* | ASG:ASGroup ?f |- _ => asgroup *)
-       (* | SG:SGroup ?f ?E |- _ => sgroup *)
-       end; auto).
-    
-
-    amonoid.
-    ?
-    apply commutative.
-    asgroup.
-    replace (a0 + b + a) with (a0 + a + b). apply IHl. agroup.
+    assert (a0 + b + a == a0 + a + b)%A. amonoid.
+    rewrite H. rewrite IHl. easy.
   Qed.
 
   Lemma fold_left_rebase_r : forall (l : list A) a b,
-      fold_left Aadd l (a + b) = (fold_left Aadd l b) + a.
+      (fold_left Aadd l (a + b) == (fold_left Aadd l b) + a)%A.
   Proof.
-    intros. rewrite (commutative a b). rewrite fold_left_rebase_l. auto.
+    intros. rewrite (commutative a b). rewrite fold_left_rebase_l. easy.
   Qed.
 
   (** (a+0+0+0+... = a *)
-  Lemma fold_left_lzero : forall n a,
-      fold_left Aadd (repeat Azero n) a = a.
+  Lemma fold_left_lzero : forall n a, (fold_left Aadd (repeat Azero n) a == a)%A.
   Proof.
-    induction n; intros; simpl; auto.
+    induction n; intros; simpl; try easy.
     rewrite fold_left_rebase_r. rewrite IHn. amonoid.
   Qed.
 
   (** Σ(ai+bi) = Σ(ai) + Σ(bi) *)
   Lemma fold_left_add : forall (l l1 l2:list A) n,
       length l = n -> length l1 = n -> length l2 = n ->
-      (forall i, i < n -> nth i l Azero = nth i l1 Azero + nth i l2 Azero) ->
-      fold_left Aadd l Azero = (fold_left Aadd l1 Azero) + (fold_left Aadd l2 Azero).
+      (forall i, i < n -> nth i l Azero == nth i l1 Azero + nth i l2 Azero)%A ->
+      (fold_left Aadd l Azero ==
+         (fold_left Aadd l1 Azero) + (fold_left Aadd l2 Azero))%A.
   Proof.
-    induction l; destruct l1,l2; intros; simpl in *; try lia.
-    - agroup.
-    - destruct n. lia.
-      inversion H; clear H. inversion H0; clear H0. inversion H1; clear H1.
-      rewrite !fold_left_rebase_l.
-      rewrite (IHl l1 l2 n); auto.
-      + agroup.
-        specialize (H2 0). simpl in H2. rewrite H2; auto. lia.
-      + intros. specialize (H2 (S i)). simpl in H2. apply H2. lia.
+    induction l; destruct l1,l2; intros; simpl in *; try lia. amonoid.
+    destruct n. lia.
+    inv H1. inv H0. inv H. 
+    (* inversion H; clear H. inversion H0; clear H0. inversion H1; clear H1. *)
+    rewrite !fold_left_rebase_l.
+    rewrite (IHl l1 l2 (length l)); auto; try lia.
+    - amonoid. specialize (H2 0); simpl in H2. apply H2. lia.
+    - intros. specialize (H2 (S i)); simpl in H2. apply H2. lia.
   Qed.
 
+  ?
   Context `{HGroup:Group A Aadd Azero Aopp}.
   
   (** (-a1)+(-a2)+... = -(a1+a2+...) *)
