@@ -25,6 +25,17 @@ Hint Resolve eq_equivalence : nat.
 (** operations are well-defined. Eg: Proper (eq ==> eq ==> eq) add *)
 Hint Resolve Nat.add_wd Nat.mul_wd : nat.
 
+(** Decidable *)
+
+#[export] Instance nat_eq_Dec : Dec (@eq nat).
+Proof. constructor. apply Nat.eq_dec. Defined.
+
+#[export] Instance nat_lt_Dec : Dec lt.
+Proof. constructor. intros. destruct (Compare_dec.lt_dec a b); auto. Defined.
+
+#[export] Instance nat_le_Dec : Dec le.
+Proof. constructor. intros. destruct (le_lt_dec a b); auto. right. lia. Defined.
+
 (** Associative *)
 
 #[export] Instance natAdd_Assoc : Associative Nat.add eq.
@@ -112,8 +123,9 @@ Hint Resolve
   natMul_ASGroup
   : nat.
 
-Goal forall x1 x2 y1 y2 a b c : nat, x1 + a + b + c + x2 = y1 + c + (b + a) + y2.
-Proof. intros. pose proof natAdd_ASGroup. asgroup. Abort.
+Goal forall x1 x2 y1 y2 a b c : nat,
+    x1 + x2 = y1 + y2 -> x1 + a + b + c + x2 = y1 + c + (b + a) + y2.
+Proof. intros. pose proof natAdd_ASGroup. asgroup. Qed.
 
 (** Monoid *)
   
@@ -136,58 +148,26 @@ Proof. constructor; auto with nat. Qed.
 #[export] Instance natMul_AMonoid : AMonoid Nat.mul 1 eq.
 Proof. constructor; auto with nat. Qed.
 
+(** Order *)
 
-(* ######################################################################### *)
-(** * Decidable *)
+(** (<, <=, <?, <=?) is an Order *)
+#[export] Instance nat_Order : Order eq lt le.
+Proof.
+  constructor; intros; try lia; auto with nat.
+  - hnf; intros; hnf; intros; lia.
+  - destruct (lt_eq_lt_dec a b) as [[H|H]|H]; auto.
+Qed.
 
-#[export] Instance nat_eq_Dec : Dec (@eq nat).
-Proof. constructor. apply Nat.eq_dec. Defined.
+(* Infix "??=" := (@dec _ _ nat_eq_Dec) : nat_scope. *)
 
-#[export] Instance nat_lt_Dec : Dec lt.
-Proof. constructor. intros. destruct (Compare_dec.lt_dec a b); auto. Defined.
+(* (* These two notations have lower priorities, and will be covered by "??<" and "??<=" *)
+(*    for Print. *) *)
+(* Notation "m ??> n" := (@dec _ _ nat_lt_Dec n m) : nat_scope. *)
+(* Notation "m ??>= n" := (@dec _ _ nat_le_Dec n m) : nat_scope. *)
 
-#[export] Instance nat_le_Dec : Dec le.
-Proof. constructor. intros. destruct (le_lt_dec a b); auto. right. lia. Defined.
-
-Infix "??=" := (@dec _ _ nat_eq_Dec) : nat_scope.
-
-(* These two notations have lower priorities, and will be covered by "??<" and "??<="
-   for Print. *)
-Notation "m ??> n" := (@dec _ _ nat_lt_Dec n m) : nat_scope.
-Notation "m ??>= n" := (@dec _ _ nat_le_Dec n m) : nat_scope.
-
-(* We mainly use these two notations to keep minimum proof obligation *)
-Infix "??<" := (@dec _ _ nat_lt_Dec) : nat_scope.
-Infix "??<=" := (@dec _ _ nat_le_Dec) : nat_scope.
-
-(* n <= n *)
-Lemma nat_le_refl : forall n : nat, n <= n.
-Proof. intros. lia. Qed.
-
-(* n <= m <-> "Ale" (derived from lt) *)
-Lemma nat_le_iff_Ale : forall (n m : nat), n <= m <-> (n < m \/ n = m).
-Proof. intros. lia. Qed.
-
-Section test.
-  Goal forall n m : nat, {n = m} + {n <> m}.
-  Proof. intros. apply Aeqdec. Abort.
-End test.
-
-(* (** (<, <=, <?, <=?) is an Order *) *)
-(* #[export] Instance nat_Order : Order lt le ltb leb. *)
-(* Proof. *)
-(*   constructor; intros; try lia. *)
-(*   destruct (lt_eq_lt_dec a b) as [[H|H]|H]; auto. *)
-(*   apply Nat.ltb_spec0. apply Nat.leb_spec0. *)
-(* Qed. *)
-
-(* Section test. *)
-
-(*   Goal forall n m : nat, n <= m \/ m < n. *)
-(*   Proof. intros. apply le_connected. Qed. *)
-
-(* End test. *)
-
+(* (* We mainly use these two notations to keep minimum proof obligation *) *)
+(* Infix "??<" := (@dec _ _ nat_lt_Dec) : nat_scope. *)
+(* Infix "??<=" := (@dec _ _ nat_le_Dec) : nat_scope. *)
 
 
 (* ######################################################################### *)

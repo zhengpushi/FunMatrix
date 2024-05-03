@@ -26,149 +26,181 @@ Hint Resolve
   Qmult_comp Qinv_comp Qdiv_comp
   : Q.
 
-(** Associative *)
+(** Decidable *)
 
-#[export] Instance Qplus_Assoc : Associative Qplus Qeq.
-Proof. constructor; intros; field. Qed.
+#[export] Instance Qeq_Dec : Dec Qeq.
+Proof. constructor. intros. apply Qeq_dec. Defined.
 
-#[export] Instance Qmult_Assoc : Associative Qmult Qeq.
-Proof. constructor; intros; field. Qed.
-
-Hint Resolve Qplus_Assoc Qmult_Assoc : Q.
-
-(** Commutative *)
-
-#[export] Instance Qplus_Comm : Commutative Qplus Qeq.
-Proof. constructor; intros; field. Qed.
-
-#[export] Instance Qmult_Comm : Commutative Qmult Qeq.
-Proof. constructor; intros; field. Qed.
-
-Hint Resolve Qplus_Comm Qmult_Comm : Q.
-
-(** Identity Left/Right *)
-#[export] Instance Qplus_IdL : IdentityLeft Qplus 0 Qeq.
-Proof. constructor; intros; field. Qed.
-
-#[export] Instance Qplus_IdR : IdentityRight Qplus 0 Qeq.
-Proof. constructor; intros; field. Qed.
-
-#[export] Instance Qmult_IdL : IdentityLeft Qmult 1 Qeq.
-Proof. constructor; intros; field. Qed.
-
-#[export] Instance Qmult_IdR : IdentityRight Qmult 1 Qeq.
-Proof. constructor; intros; field. Qed.
-
-Hint Resolve
-  Qplus_IdL Qplus_IdR
-  Qmult_IdL Qmult_IdR : Q.
-
-(** Inverse Left/Right *)
-
-(* #[export] Instance Qmult_IdL : IdentityLeft Qmult 1 Qeq. *)
-(* Proof. constructor; intros; field. Qed. *)
-
-(* #[export] Instance Qmult_IdR : IdentityRight Qmult 1 Qeq. *)
-(* Proof. constructor; intros; field. Qed. *)
-
-(* Hint Resolve *)
-(*   Qplus_IdL *)
-(*   Qplus_IdR *)
-(*   Qmult_IdL *)
-(*   Qmult_IdR *)
-(*   : Q. *)
-
-(** Distributive *)
-
-#[export] Instance Qmult_add_DistrL : DistrLeft Qplus Qmult Qeq.
-Proof. constructor; intros; field. Qed.
-
-#[export] Instance Qmult_add_DistrR : DistrRight Qplus Qmult Qeq.
-Proof. constructor; intros; field. Qed.
-
-Hint Resolve
-  Qmult_add_DistrL
-  Qmult_add_DistrR
-  : Q.
-
-(** Semigroup *)
-
-#[export] Instance Qplus_SGroup : SGroup Qplus Qeq.
-Proof. constructor; auto with Q. Qed.
-
-#[export] Instance Qmult_SGroup : SGroup Qmult Qeq.
-Proof. constructor; auto with Q. Qed.
-
-Hint Resolve
-  Qplus_SGroup
-  Qmult_SGroup
-  : Q.
-
-(** Abelian semigroup *)
-
-#[export] Instance Qplus_ASGroup : ASGroup Qplus Qeq.
-Proof. constructor; auto with Q. Qed.
-
-#[export] Instance Qmult_ASGroup : ASGroup Qmult Qeq.
-Proof. constructor; auto with Q. Qed.
-
-Hint Resolve
-  Qplus_ASGroup
-  Qmult_ASGroup
-  : Q.
-
-(** Monoid *)
-  
-#[export] Instance Qplus_Monoid : Monoid Qplus 0 Qeq.
-Proof. constructor; auto with Q. Qed.
-
-#[export] Instance Qmult_Monoid : Monoid Qmult 1 Qeq.
-Proof. constructor; auto with Q. Qed.
-
-Hint Resolve
-  Qplus_Monoid
-  Qmult_Monoid
-  : Q.
-
-(** Abelian monoid *)
-  
-#[export] Instance Qplus_AMonoid : AMonoid Qplus 0 Qeq.
-Proof. constructor; auto with Q. Qed.
-  
-#[export] Instance Qmult_AMonoid : AMonoid Qmult 1 Qeq.
-Proof. constructor; auto with Q. Qed.
-
-
-(* ######################################################################### *)
-(** * Decidable *)
-
-#[export] Instance Q_eq_Dec : Dec (@eq Q).
-Proof.
-  constructor. intros. destruct a as [p1 q1], b as [p2 q2].
-  destruct (Aeqdec p1 p2), (Aeqdec q1 q2); subst; auto.
-  all: right; intro; inversion H; easy.
-Defined.
-
-#[export] Instance Q_le_Dec : Dec Qle.
-Proof.
-  constructor. intros. destruct (Qlt_le_dec b a); auto.
-  right. intro. apply Qle_not_lt in H. easy.
-Defined.
-
-#[export] Instance Q_lt_Dec : Dec Qlt.
+#[export] Instance Qlt_Dec : Dec Qlt.
 Proof.
   constructor. intros. destruct (Qlt_le_dec a b); auto.
   right. intro. apply Qle_not_lt in q. easy.
 Defined.
 
-(* n <= n *)
-Lemma Q_le_refl : forall n : Q, n <= n.
-Proof. apply Qle_refl. Qed.
+#[export] Instance Qle_Dec : Dec Qle.
+Proof.
+  constructor. intros. destruct (Qlt_le_dec b a); auto.
+  right. intro. apply Qle_not_lt in H. easy.
+Defined.
 
-Section test.
-  Goal forall a b : Q, {a = b} + {a <> b}.
-  Proof. intros. apply Aeqdec. Abort.
-End test.
+(** Associative *)
+
+#[export] Instance Qadd_Assoc : Associative Qplus Qeq.
+Proof. constructor; intros; field. Qed.
+
+#[export] Instance Qmul_Assoc : Associative Qmult Qeq.
+Proof. constructor; intros; field. Qed.
+
+Hint Resolve Qadd_Assoc Qmul_Assoc : Q.
+
+(** Commutative *)
+
+#[export] Instance Qadd_Comm : Commutative Qplus Qeq.
+Proof. constructor; intros; field. Qed.
+
+#[export] Instance Qmul_Comm : Commutative Qmult Qeq.
+Proof. constructor; intros; field. Qed.
+
+Hint Resolve Qadd_Comm Qmul_Comm : Q.
+
+(** Identity Left/Right *)
+#[export] Instance Qadd_IdL : IdentityLeft Qplus 0 Qeq.
+Proof. constructor; intros; field. Qed.
+
+#[export] Instance Qadd_IdR : IdentityRight Qplus 0 Qeq.
+Proof. constructor; intros; field. Qed.
+
+#[export] Instance Qmul_IdL : IdentityLeft Qmult 1 Qeq.
+Proof. constructor; intros; field. Qed.
+
+#[export] Instance Qmul_IdR : IdentityRight Qmult 1 Qeq.
+Proof. constructor; intros; field. Qed.
+
+Hint Resolve
+  Qadd_IdL Qadd_IdR
+  Qmul_IdL Qmul_IdR : Q.
+
+(** Inverse Left/Right *)
+
+#[export] Instance Qadd_InvL : InverseLeft Qplus 0 Qopp Qeq.
+Proof. constructor; intros; ring. Qed.
+
+#[export] Instance Qadd_InvR : InverseRight Qplus 0 Qopp Qeq.
+Proof. constructor; intros; ring. Qed.
+
+Hint Resolve Qadd_InvL Qadd_InvR : Q.
+
+(** Distributive *)
+
+#[export] Instance Qmul_add_DistrL : DistrLeft Qplus Qmult Qeq.
+Proof. constructor; intros; field. Qed.
+
+#[export] Instance Qmul_add_DistrR : DistrRight Qplus Qmult Qeq.
+Proof. constructor; intros; field. Qed.
+
+Hint Resolve
+  Qmul_add_DistrL
+  Qmul_add_DistrR
+  : Q.
+
+(** Semigroup *)
+
+#[export] Instance Qadd_SGroup : SGroup Qplus Qeq.
+Proof. constructor; auto with Q. Qed.
+
+#[export] Instance Qmul_SGroup : SGroup Qmult Qeq.
+Proof. constructor; auto with Q. Qed.
+
+Hint Resolve
+  Qadd_SGroup
+  Qmul_SGroup
+  : Q.
+
+(** Abelian semigroup *)
+
+#[export] Instance Qadd_ASGroup : ASGroup Qplus Qeq.
+Proof. constructor; auto with Q. Qed.
+
+#[export] Instance Qmul_ASGroup : ASGroup Qmult Qeq.
+Proof. constructor; auto with Q. Qed.
+
+Hint Resolve
+  Qadd_ASGroup
+  Qmul_ASGroup
+  : Q.
+
+(** Monoid *)
+  
+#[export] Instance Qadd_Monoid : Monoid Qplus 0 Qeq.
+Proof. constructor; auto with Q. Qed.
+
+#[export] Instance Qmul_Monoid : Monoid Qmult 1 Qeq.
+Proof. constructor; auto with Q. Qed.
+
+Hint Resolve
+  Qadd_Monoid
+  Qmul_Monoid
+  : Q.
+
+(** Abelian monoid *)
+  
+#[export] Instance Qadd_AMonoid : AMonoid Qplus 0 Qeq.
+Proof. constructor; auto with Q. Qed.
+  
+#[export] Instance Qmul_AMonoid : AMonoid Qmult 1 Qeq.
+Proof. constructor; auto with Q. Qed.
+
+Hint Resolve Qadd_AMonoid Qmul_AMonoid : Q.
+
+(** Group *)
+
+#[export] Instance Qadd_Group : Group Qplus 0 Qopp Qeq.
+Proof. constructor; auto with Q. Qed.
+
+Hint Resolve Qadd_Group : Q.
+
+(** AGroup *)
+
+#[export] Instance Qadd_AGroup : AGroup Qplus 0 Qopp Qeq.
+Proof. constructor; auto with Q. Qed.
+
+Hint Resolve Qadd_AGroup : Q.
+
+(** Ring *)
+
+#[export] Instance Q_Ring : Ring Qplus 0 Qopp Qmult 1 Qeq.
+Proof. constructor; auto with Q. Qed.
+
+Hint Resolve Q_Ring : Q.
+
+(** ARing *)
+
+#[export] Instance Q_ARing : ARing Qplus 0 Qopp Qmult 1 Qeq.
+Proof. constructor; auto with Q. Qed.
+
+Hint Resolve Q_ARing : Q.
+
+(** Field *)
+
+#[export] Instance Q_Field : Field Qplus 0 Qopp Qmult 1 Qinv Qeq.
+Proof.
+  constructor; auto with Q.
+  - intros. field; auto.
+  - intro. easy.
+Qed.
+
+Hint Resolve Q_Field : Q.
+
+(** Order *)
+
+#[export] Instance Q_Order : Order Qeq Qlt Qle.
+Proof.
+  constructor; intros; try lia; auto with Q; auto with qarith.
+  - hnf; intros; hnf; intros. rewrite H,H0. easy.
+  - apply Qlt_trans with b; auto.
+  - apply Q_dec.
+  - rewrite Qle_lteq. easy.
+Qed.
 
 
 (* ######################################################################### *)
@@ -245,21 +277,21 @@ Qed.
 (*   - apply Qeqb_false_iff_equiv. apply Qneq_iff_neq. auto. *)
 (* Qed. *)
 
-(** (==) is equivalence relation *)
-Lemma Qeq_equiv : equivalence _ Qeq.
-Proof.
-  split;intro;intros;try easy. rewrite H;try easy.
-Qed.
+(* (** (==) is equivalence relation *) *)
+(* Lemma Qeq_equiv : equivalence _ Qeq. *)
+(* Proof. *)
+(*   split;intro;intros;try easy. rewrite H;try easy. *)
+(* Qed. *)
 
 
 (* ######################################################################### *)
 (** * Others *)
 
 (** This is needed by field_theory (EQ version, original is equiv version) *)
-(* Lemma Qmult_inv_l_EQ : forall p : Q, p <> 0 -> /p * p = 1. *)
+(* Lemma Qmul_inv_l_EQ : forall p : Q, p <> 0 -> /p * p = 1. *)
 (* Proof. *)
-(*   intros. apply Qeq_iff_eq. rewrite Qmult_comm. *)
-(*   apply Qmult_inv_r. apply Qneq_iff_neq. auto. *)
+(*   intros. apply Qeq_iff_eq. rewrite Qmul_comm. *)
+(*   apply Qmul_inv_r. apply Qneq_iff_neq. auto. *)
 (* Qed. *)
  
 

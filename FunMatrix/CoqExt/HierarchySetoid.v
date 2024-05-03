@@ -46,25 +46,29 @@
      IdentityRight f e Aeq          ∀ a, f a e == a
      DistrLeft Aadd Amul Aeq        ∀ a b c, a * (b + c) == a * b + a * c
      DistrRight Aadd Amul Aeq       ∀ a b c, (a + b) * c == a * c + b * c
-     Order Aeq Alt Ale              order {==,<,<=}
      SGroup Aadd Aeq                semigroup {+,==}. Aadd is associative
      ASGroup Aadd Aeq               abelian semigroup {+,==}. Aadd is commutative
      Monoid Aadd Azero Aeq          monoid {+,0,==}
      AMonoid Aadd Azero Aeq         abelian monoid {+,0,==}
      Group Aadd Azero Aopp Aeq      group {+,0,-a,==}
      AGroup Aadd Azero Aopp Aeq     abelian group {+,0,-a,==}
-     SemiRing Aadd Azero Amul Aone Aeq    semiring {+,0,*,1,==}
-     Ring Aadd Azero Aopp Amul Aone Aeq   ring {+,0,-a,*,1}
-     ARing Aadd Azero Aopp Amul Aone Aeq  abelian ring {+,0,-a,*,1}
-     OrderedARing Aadd Azero Aopp Amul Aone Aeq Alt Ale   abelian-ring {+,0,-a,*,1} + order
+     SemiRing Aadd Azero Amul Aone Aeq     semiring {+,0,*,1,==}
+     Ring Aadd Azero Aopp Amul Aone Aeq    ring {+,0,-a,*,1}
+     ARing Aadd Azero Aopp Amul Aone Aeq   abelian ring {+,0,-a,*,1}
      Field Aadd Azero Aopp Amul Aone Ainv  field {+,0,-a,*,1,/a}
-     OrderedField Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale  field {+,0,-a,*,1,/a} + order
-     ConvertToR Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale (a2r:A->R)
-                The `a2r` operation is consistent
+     Order Aeq Alt Ale              order {==,<,<=}
+     OrderedARing Aadd Azero Aopp Amul Aone Aeq Alt Ale   
+                  abelian-ring {+,0,-a,*,1} + order
+     OrderedField Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale  
+                  field {+,0,-a,*,1,/a} + order
+     A2R Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale (a2r:A->R)
+                operations {+,0,-x,*,1,/x,==,<,<=} is consistent with a2r
   
      ============= The structure of algebraic structure ===============
 
-                  ARing     Field
+            OrderedARing     OrderedAField
+              /    \           /     \
+         (Order)  ARing     Field  (Order)
                  /     \    /
               AGroup    Ring
              /     \    /
@@ -72,7 +76,7 @@
          /    \    /
      ASGroup  Monoid
         \     /
-        SGroup
+        SGroup             Order   A2R
 
   2. tactics
      * SGroup
@@ -196,7 +200,7 @@ Class Dec {A:Type} (Acmp:A->A->Prop) := {
   }.
 
 (* We prefer don't simpl `dec` *)
-Arguments dec {A} _ {_} : simpl never.
+Arguments dec {A Acmp _} : simpl never.
 
 (* Global Hint Constructors Dec : core. *)
 
@@ -211,7 +215,7 @@ Section Theories.
   (** Tips: these theories are useful for R type *)
   
   (** Calculate equality to boolean, with the help of equality decidability *)
-  Definition Acmpb (a b : A) : bool := if dec Acmp a b then true else false.
+  Definition Acmpb (a b : A) : bool := if @dec _ Acmp HDec a b then true else false.
 
   (** Acmpb is true iff Acmp hold. *)
   Lemma Acmpb_true : forall a b, Acmpb a b = true <-> Acmp a b.
@@ -224,11 +228,7 @@ Section Theories.
   Proof. intros. rewrite <- Acmpb_true. split; solve_bool. Qed.
 
   Lemma Acmp_reflect : forall a b : A, reflect (Acmp a b) (Acmpb a b).
-  Proof. intros. unfold Acmpb. destruct (dec Acmp a b); constructor; auto. Qed.
-
-  (* forall l1 l2 : list A, {l1 == l2} + {l1 <> l2} *)
-  #[export] Instance list_Dec `{Dec _ (@eq A)} : Dec (@eq (list A)).
-  Proof. constructor. intros. apply list_eq_dec. apply Aeqdec. Defined.
+  Proof. intros. unfold Acmpb. destruct (dec a b); constructor; auto. Qed.
 
   Context {B : Type}.
 
@@ -304,17 +304,19 @@ End Theories.
 
 (** ** Class *)
 
-Class Injective {A B} (phi: A -> B) := {
-    injective : forall a1 a2 : A, a1 <> a2 -> phi a1 <> phi a2
+Class Injective {A B} {Aeq: relation A} {Beq: relation B} (phi: A -> B) := {
+    injective : forall a1 a2 : A, ~(Aeq a1 a2) -> ~(Beq (phi a1) (phi a2))
   }.
 
 (** ** Theories *)
 Section Theories.
-  Context {A B : Type}.
+  Context {A B : Type} {Aeq: relation A} {Beq: relation B}.
   
+  Notation Injective := (Injective (Aeq:=Aeq) (Beq:=Beq)).
+
   (** Second form of injective *)
   Definition injective_form2 (phi: A -> B) :=
-    forall a1 a2, phi a1 = phi a2 -> a1 = a2.
+    forall a1 a2, Beq (phi a1) (phi a2) -> Aeq a1 a2.
 
   (** These two forms are equal *)
   Lemma injective_eq_injective_form2 (phi: A -> B) :
@@ -322,15 +324,14 @@ Section Theories.
   Proof.
     split; intros.
     - hnf. destruct H as [H]. intros.
-      specialize (H a1 a2). apply imply_to_or in H. destruct H.
-      + apply NNPP in H. auto.
-      + easy.
+      specialize (H a1 a2). apply imply_to_or in H. destruct H; try easy.
+      apply NNPP in H. auto.
     - hnf in H. constructor. intros. intro. apply H in H1. easy.
   Qed.
 
   (** Injective function preserve equal relation *)
   Lemma injective_preserve_eq : forall (f : A -> B),
-      Injective f -> (forall a1 a2, f a1 = f a2 -> a1 = a2).
+      Injective f -> (forall a1 a2 : A, Beq (f a1) (f a2) -> Aeq a1 a2).
   Proof.
     intros. apply injective_eq_injective_form2 in H. apply H. auto.
   Qed.
@@ -347,8 +348,8 @@ End Theories.
 
 (** ** Class *)
 
-Class Surjective {A B} (phi: A -> B) := {
-    surjective : forall b, (exists a, phi a = b)
+Class Surjective {A B : Type} {Beq: relation B} (phi: A -> B) := {
+    surjective : forall (b : B), (exists (a : A), Beq (phi a) b)
   }.
 
 (** ** Theories *)
@@ -363,9 +364,9 @@ Class Surjective {A B} (phi: A -> B) := {
 
 (** ** Class *)
 
-Class Bijective {A B} (phi: A -> B) := {
-    bijInjective :: Injective phi;
-    bijSurjective :: Surjective phi
+Class Bijective {A B : Type} {Aeq: relation A} {Beq: relation B} (phi: A -> B) := {
+    bijInjective :: Injective (Aeq:=Aeq) (Beq:=Beq) phi;
+    bijSurjective :: Surjective (Beq:=Beq) phi
   }.
 
 (* Tips: About ":>", "::", coercion:
@@ -378,8 +379,28 @@ Coercion bijInjective : Bijective >-> Injective.
 Coercion bijSurjective : Bijective >-> Surjective.
 
 (** ** Theories *)
+
+
+(** x is an unique element which holds by P. Setoid version *)
+Definition unique_setoid {A: Type} {Aeq: relation A} (P: A -> Prop) (x: A) :=
+  P x /\ (forall x' : A, P x' -> Aeq x x').
+
+(** constructive_definite_description, setoid version *)
+Axiom constructive_definite_description_setoid :
+  forall (A : Type) (Aeq:relation A) (P : A -> Prop),
+    (exists x : A, (P x /\ unique_setoid (Aeq:=Aeq) P x)) -> {x : A | P x}.
+
+(** functional_extensionality, setoid version *)
+Axiom functional_extensionality_setoid :
+  forall {A B} {Beq: relation B} (feq: relation (A->B)) (f g : A -> B),
+    (forall a : A, Beq (f a) (g a)) -> feq f g.
+
 Section Theories.
-  Context {A B : Type}.
+  Context {A B: Type} {Aeq:relation A} {Beq:relation B}.
+  Context {Equiv_Aeq:Equivalence Aeq} {Equiv_Beq:Equivalence Beq}.
+  Notation Bijective := (Bijective (Aeq:=Aeq) (Beq:=Beq)).
+  Infix "=A=" := Aeq (at level 70).
+  Infix "=B=" := Beq (at level 70).
   
   (** There exist inverse function from a bijective function.
 
@@ -394,30 +415,42 @@ Section Theories.
    *)
 
   Lemma bij_inverse_exist : forall (phi : A -> B) (Hbij: Bijective phi),
-    {psi : B -> A | (forall a : A, psi (phi a) = a) /\  (forall b : B, phi (psi b) = b)}.
+    {psi : B -> A | (forall a : A, (psi (phi a)) =A= a) /\  (forall b : B, phi (psi b) =B= b)}.
   Proof.
     intros. destruct Hbij as [Hinj [Hsurj]].
     apply injective_eq_injective_form2 in Hinj. hnf in *.
-    assert (H : forall b, exists! a, phi a = b).
+    (* Tips, unique is eq version, we need setoid version *)
+    (* assert (H : forall b, exists! a, phi a =B= b). *)
+    assert (H: forall b, exists a, phi a =B= b /\ unique_setoid (Aeq:=Aeq) (fun x => phi x =B= b) a).
     { intros b.
-      destruct (Hsurj b) as [a Ha]. exists a. repeat split; auto.
-      intros a' Ha'. apply Hinj. rewrite Ha. auto. }
-    apply constructive_definite_description.
-    exists (fun b => proj1_sig (constructive_definite_description _ (H b))). split. 
+      destruct (Hsurj b) as [a Ha]. exists a. unfold unique_setoid. repeat split; auto.
+      intros a' Ha'. apply Hinj. rewrite Ha. rewrite Ha'. easy. }
+    eapply constructive_definite_description_setoid.
+    exists (fun b => proj1_sig (constructive_definite_description_setoid (H b))).
+    split.
     - split.
-      + intros a. destruct (constructive_definite_description). simpl. auto.
-      + intros b. destruct (constructive_definite_description). simpl. auto.
-    - intro psi; intros. apply functional_extensionality.
-      intros b. destruct (constructive_definite_description). simpl.
-      destruct H0. rewrite <- e. auto.
+      + intros a. destruct (constructive_definite_description_setoid). simpl.
+        apply Hinj. auto.
+      + intros b. destruct (constructive_definite_description_setoid). simpl. auto.
+    - hnf. split.
+      + split.
+        * intros. destruct (constructive_definite_description_setoid). simpl.
+          apply Hinj. auto.
+        * intros. destruct (constructive_definite_description_setoid). simpl. auto.
+      + intros psi [H1 H2].
+        eapply functional_extensionality_setoid.
+        intros b. destruct (constructive_definite_description_setoid). simpl.
+        assert (phi (psi b) =B= b); auto using H2.
+        rewrite <- H0 in b0. apply Hinj in b0. exact b0.
+        Unshelve. exact eq.
   Defined.
 
   (** A bijective function preserve equal relation *)
   Lemma bijective_preserve_eq : forall (f : A -> B),
-      Bijective f -> (forall (a1 a2 : A), f a1 = f a2 -> a1 = a2).
+      Bijective f -> (forall (a1 a2 : A), Beq (f a1) (f a2) -> Aeq a1 a2).
   Proof.
     intros. destruct H as [Hinj Hsurj].
-    apply injective_preserve_eq in H0; auto.
+    apply (injective_preserve_eq (Aeq:=Aeq)) in H0; auto.
   Qed.
 
 End Theories.
@@ -432,9 +465,9 @@ End Theories.
 
 (** ** Class *)
 
-Class Homomorphic {A B}
+Class Homomorphic {A B : Type} {Beq: relation B}
   (fa : A -> A -> A) (fb : B -> B -> B) (phi: A -> B) := {
-    homomorphic : forall (a1 a2 : A), phi (fa a1 a2) = fb (phi a1) (phi a2)
+    homomorphic : forall (a1 a2 : A), Beq (phi (fa a1 a2)) (fb (phi a1) (phi a2))
   }.
 
 (** ** Theories *)
@@ -459,15 +492,25 @@ End Theories.
 
 (** If there exist a homomorphic and surjective mapping from <A,+> to <B,⊕>,
     then we said <A,+> and <B,⊕> is homomorphism *)
-Class Homomorphism {A B} (fa : A -> A -> A) (fb : B -> B -> B) := {
-    homomorphism : exists (phi: A -> B), Homomorphic fa fb phi /\ Surjective phi
+Class Homomorphism {A B : Type} {Aeq: relation A} {Beq: relation B}
+  (fa : A -> A -> A) (fb : B -> B -> B) := {
+    homomorphism : exists (phi: A -> B),
+      Homomorphic fa fb phi (Beq:=Beq)
+      /\ Surjective phi (Beq:=Beq)
+      (* need this condition, although this is not explicit in math. *)
+      /\ Proper (Aeq ==> Beq) phi
   }.
 
 (** If there exist two homomorphic and surjective mapping from <A,+> to <B,⊕>
     and from <A,*> to <B,⊗>, then we said <A,+,*> and <B,⊕,⊗> is homomorphism *)
-Class Homomorphism2 {A B} (fa ga : A -> A -> A) (fb gb : B -> B -> B) := {
+Class Homomorphism2 {A B : Type} {Aeq: relation A} {Beq: relation B}
+  (fa ga : A -> A -> A) (fb gb : B -> B -> B) := {
     homomorphism2 : exists (phi: A -> B),
-      Homomorphic fa fb phi /\ Homomorphic ga gb phi /\ Surjective phi
+      Homomorphic fa fb phi (Beq:=Beq)
+      /\ Homomorphic ga gb phi (Beq:=Beq)
+      /\ Surjective phi (Beq:=Beq)
+      (* need this condition, although this is not explicit in math. *)
+      /\ Proper (Aeq ==> Beq) phi
   }.
 
 (** ** Theories *)
@@ -484,15 +527,25 @@ Class Homomorphism2 {A B} (fa ga : A -> A -> A) (fb gb : B -> B -> B) := {
 
 (** If there exist a homomorphic and bijective mapping from <A,+> to <B,⊕>,
     then we said <A,+> and <B,⊕> is isomorphism *)
-Class Isomorphism {A B} (fa : A -> A -> A) (fb : B -> B -> B) := {
-    isomorphism : exists (phi: A -> B), Homomorphic fa fb phi /\ Bijective phi
+Class Isomorphism {A B : Type} {Aeq: relation A} {Beq: relation B}
+  (fa : A -> A -> A) (fb : B -> B -> B) := {
+    isomorphism : exists (phi: A -> B),
+      Homomorphic fa fb phi (Beq:=Beq)
+      /\ Bijective phi (Aeq:=Aeq) (Beq:=Beq)
+      (* need this condition, although this is not explicit in math. *)
+      /\ Proper (Aeq ==> Beq) phi
   }.
 
 (** If there exist two homomorphic and bijective mapping from <A,+> to <B,⊕>
     and from <A,*> to <B,⊗>, then we said <A,+,*> and <B,⊕,⊗> is isomorphism *)
-Class Isomorphism2 {A B} (fa ga : A -> A -> A) (fb gb : B -> B -> B) := {
+Class Isomorphism2 {A B : Type} {Aeq: relation A} {Beq: relation B}
+  (fa ga : A -> A -> A) (fb gb : B -> B -> B) := {
     isomorphism2 : exists (phi: A -> B),
-      Homomorphic fa fb phi /\ Homomorphic ga gb phi /\ Bijective phi
+      Homomorphic fa fb phi (Beq:=Beq)
+      /\ Homomorphic ga gb phi (Beq:=Beq)
+      /\ Bijective phi (Aeq:=Aeq) (Beq:=Beq)
+      (* need this condition, although this is not explicit in math. *)
+      /\ Proper (Aeq ==> Beq) phi
   }.
 
 (** ** Theories *)
@@ -506,19 +559,20 @@ Class Isomorphism2 {A B} (fa ga : A -> A -> A) (fb gb : B -> B -> B) := {
 (** * Subset *)
 
 (** ** Class *)
-(* C is subset of P *)
-Class Subset (C P : Type) := {
-    sub_phi : C -> P;
-    sub_phi_inj : Injective sub_phi
+
+(** A is subset of B *)
+Class Subset (A B : Type) (Aeq : relation A) (Beq : relation B) := {
+    sub_phi : A -> B;
+    sub_phi_inj : @Injective _ _ Aeq Beq sub_phi
   }.
 
 (** ** Theories *)
 
 (** ** Instances *)
 
-Instance nat_Z_Subset : Subset nat Z.
+#[export] Instance nat_Z_Subset : @Subset nat Z eq eq.
 Proof.
-  refine (@Build_Subset _ _ Z.of_nat _).
+  refine (@Build_Subset nat Z _ _ Z.of_nat _).
   rewrite injective_eq_injective_form2. hnf. apply Nat2Z.inj.
 Qed.
 
@@ -1000,13 +1054,13 @@ Ltac asgroup_core op aeq :=
          end
      end;
      try easy);
-  asgroup_smaller.
+  try asgroup_smaller.
 
 (** Eliminate all possible common sub terms on Abelian semigroup in current context
     消去上下文中交换半群上的所有可能相同的项 *)
 Ltac asgroup :=
   try match goal with ASG:ASGroup ?op ?aeq |- _ => asgroup_core op aeq end;
-  asgroup_smaller.
+  try asgroup_smaller.
 
 (** ** Instances *)
 
@@ -1121,12 +1175,12 @@ Ltac monoid_core op e aeq :=
      | M:Monoid op e aeq |- _ => pose proof (monoidSGroup M) as HSGroup
      end;
      try easy);
-  monoid_smaller.
+  try monoid_smaller.
 
 (* Simplify expressions on monoid in current context *)
 Ltac monoid :=
   try match goal with M:Monoid ?op ?e ?aeq |- _ => monoid_core op e aeq end;
-  monoid_smaller.
+  try monoid_smaller.
 
 
 (** ** Instances *)
@@ -1198,12 +1252,12 @@ Ltac amonoid_core op e aeq :=
            try pose proof (amonoidASGroup AM) as HASGroup
        end;
      try easy);
-  amonoid_smaller.
+  try amonoid_smaller.
 
 (* Simplify expressions on Abelian monoid in current context *)
 Ltac amonoid :=
   try match goal with AM:AMonoid ?op ?e ?aeq |- _ => amonoid_core op e aeq end;
-  amonoid_smaller.
+  try amonoid_smaller.
 
 (** ** Instances *)
 
@@ -1307,14 +1361,14 @@ Ltac group_basic_core op e inv aeq :=
        | G:Group ?op ?e ?inv ?aeq |- _ => try pose proof (groupMonoid G) as HMonoid
        end;
      try easy);
-  group_smaller.
+  try group_smaller.
 
 (* Basic simplify on group in current context *)
 Ltac group_basic :=
   try match goal with
       G:Group ?op ?e ?inv ?aeq |- _ => group_basic_core op e inv aeq
     end;
-  group_smaller.
+  try group_smaller.
 
 Section test.
   Context `{HGroup : Group}.
@@ -1684,21 +1738,9 @@ Ltac group_core op e inv aeq :=
 (* Simplfy expressions on group in current context *)
 Ltac group :=
   try match goal with G:Group ?op ?e ?inv ?aeq |- _ => group_core op e inv aeq end;
-  group_smaller.
+  try group_smaller.
 
-
-(* (** ** Instances *) *)
-(* Section Instances. *)
-
-(*   Import Qcanon Reals. *)
-  
-(*   #[export] Instance Qc_add_Group : Group Qcplus 0 Qcopp. *)
-(*   split_intro; subst; ring. Qed. *)
-
-(*   #[export] Instance R_add_Group : Group Rplus 0%R Ropp. *)
-(*   split_intro; subst; ring. Qed. *)
-
-(* End Instances. *)
+(** ** Instances *)
 
 (** ** Examples *)
 Section Examples.
@@ -1810,25 +1852,14 @@ Ltac agroup_core op e inv aeq :=
            try pose proof (agroupAM AG) as HAMonoid
        end;
      try easy);
-  agroup_smaller.
+  try agroup_smaller.
 
 (* Simplify expressions on Abelian group in current context *)
 Ltac agroup :=
   try match goal with AG:AGroup ?op ?e ?inv ?aeq |- _ => agroup_core op e inv aeq end;
-  agroup_smaller.
+  try agroup_smaller.
 
 (** ** Instances *)
-(* Section Instances. *)
-
-(*   Import Qcanon Reals. *)
-  
-(*   #[export] Instance Qc_add_AGroup : AGroup Qcplus 0 Qcopp. *)
-(*   split_intro; subst; ring. Qed. *)
-
-(*   #[export] Instance R_add_AGroup : AGroup Rplus 0%R Ropp. *)
-(*   split_intro; subst; ring. Qed. *)
-
-(* End Instances. *)
 
 (** ** Examples *)
 Section Examples.
@@ -1869,23 +1900,6 @@ Coercion sringMulAM : SRing >-> AMonoid.
 (** ** Theories *)
 
 (** ** Instances *)
-(* Section Instances. *)
-
-(*   Import Nat ZArith Qcanon Reals. *)
-
-(*   #[export] Instance nat_SRing : SRing Nat.add 0%nat Nat.mul 1%nat. *)
-(*   repeat constructor; intros; ring. Qed. *)
-  
-(*   #[export] Instance Z_SRing : SRing Z.add 0%Z Z.mul 1%Z. *)
-(*   repeat constructor; intros; ring. Qed. *)
-  
-(*   #[export] Instance Qc_SRing : SRing Qcplus 0 Qcmult 1. *)
-(*   repeat constructor; intros; ring. Qed. *)
-
-(*   #[export] Instance R_SRing : SRing Rplus R0 Rmult R1. *)
-(*   split_intro; subst; ring. Qed. *)
-
-(* End Instances. *)
 
 (** ** Examples *)
 
@@ -1926,32 +1940,8 @@ Section Theory.
 End Theory.
 
 (** ** Instances *)
-(* Section Instances. *)
-
-(*   Import ZArith Qcanon Reals. *)
-
-(*   #[export] Instance Z_Ring : Ring Z.add 0%Z Z.opp Z.mul 1%Z. *)
-(*   repeat constructor; intros; ring. Qed. *)
-  
-(*   #[export] Instance Qc_Ring : Ring Qcplus 0 Qcopp Qcmult 1. *)
-(*   repeat constructor; intros; ring. Qed. *)
-
-(*   #[export] Instance R_Ring : Ring Rplus R0 Ropp Rmult R1. *)
-(*   repeat constructor; intros; ring. Qed. *)
-
-(* End Instances. *)
 
 (** ** Examples *)
-
-(* Section Examples. *)
-
-(*   Import Reals. *)
-(*   Open Scope R_scope. *)
-  
-(*   Goal forall a b c : R, a * (b + c) = a * b + a * c. *)
-(*   Proof. apply distrLeft. Qed. *)
-
-(* End Examples. *)
   
 
 (* ######################################################################### *)
@@ -2022,18 +2012,7 @@ Section Theory.
   
 End Theory.
 
-(* (** ** Instances *) *)
-(* Section Instances. *)
-
-(*   Import ZArith Qcanon Reals. *)
-
-(*   #[export] Instance Z_ARing : ARing Z.add 0%Z Z.opp Z.mul 1%Z. *)
-(*   repeat constructor; intros; ring. Qed. *)
-  
-(*   #[export] Instance Ac_ARing : ARing Qcplus 0 Qcopp Qcmult 1. *)
-(*   repeat constructor; intros; ring. Qed. *)
-
-(* End Instances. *)
+(** ** Instances *)
 
 (** ** Examples *)
 
@@ -2124,6 +2103,208 @@ End Demo_concrate_ring.
 
 
 (* ######################################################################### *)
+(** * Field *)
+
+(** ** Class *)
+Class Field {A} Aadd (Azero:A) Aopp Amul Aone Ainv Aeq := {
+    fieldRing :: ARing Aadd Azero Aopp Amul Aone Aeq;
+    fieldAinvProper :: Proper (Aeq ==> Aeq) Ainv;
+    field_mulInvL : forall a, ~(Aeq a Azero) -> Aeq (Amul (Ainv a) a) Aone;
+    field_1_neq_0 : ~(Aeq Aone Azero);
+    
+    (* Tips: 也许还遗漏了一个条件，即：0 没有逆元。一个可能的方案如下：
+       If we have "/0", then prove anything *)
+    (* field_inv0_False : { x : A | x = Ainv Azero } -> False *)
+
+    (* But, this is a bad idea. Because there exist "/0" in R.
+       Rinv_0: / 0 = 0
+       I can't deal with "/0" perfectly right now. *)
+  }.
+Coercion fieldRing : Field >-> ARing.
+
+(** ** Theories *)
+
+(** make a `field_theory` from `Field` *)
+Lemma make_field_theory `(HField : Field)
+  : field_theory Azero Aone Aadd Amul
+      (fun x y => Aadd x (Aopp y)) Aopp
+      (fun x y => Amul x (Ainv y)) Ainv Aeq.
+  Proof.
+    constructor; intros;
+      try (rewrite ?identityLeft,?associative; reflexivity);
+      try (rewrite commutative; reflexivity).
+    apply (make_ring_theory fieldRing).
+    apply field_1_neq_0.
+    apply field_mulInvL. auto.
+ Qed.
+
+Section Theory.
+  Context `{HField : Field}.
+  Add Field field_inst : (make_field_theory HField).
+
+  Infix "==" := Aeq.
+  Infix "+" := Aadd.
+  Notation "- a" := (Aopp a).
+  Notation Asub a b := (a + -b).
+  Notation "0" := Azero.
+  Notation "1" := Aone.
+  Infix "*" := Amul.
+  Notation "/ a" := (Ainv a).
+  Notation Adiv a b := (a * (/b)).
+  Infix "/" := Adiv.
+
+  (** ~(a == 0) -> a * / a == 1 *)
+  Lemma field_mulInvR : forall a : A, ~(a == 0) -> a * /a == 1.
+  Proof. intros. rewrite commutative. rewrite field_mulInvL; easy. Qed.
+
+  (** ~(a == 0) -> (1/a) * a == 1 *)
+  Lemma field_mulInvL_inv1 : forall a : A, ~(a == 0) -> (1/a) * a == 1.
+  Proof. intros. simpl. field; auto. Qed.
+  
+  (** ~(a == 0) -> a * (1/a) == 1 *)
+  Lemma field_mulInvR_inv1 : forall a : A, ~(a == 0) -> a * (1/a) == 1.
+  Proof. intros. simpl. field. auto. Qed.
+
+  (** ~(a == 0) -> / ~(a == 0) *)
+  Lemma field_inv_neq0_if_neq0 : forall a : A, ~(a == 0) -> ~(/ a == 0).
+  Proof.
+    intros. intro.
+    pose proof (field_mulInvL H). rewrite H0 in H1. rewrite ring_mul_0_l in H1.
+    apply field_1_neq_0. easy.
+  Qed.
+
+  (** ~(- 1 == 0) *)
+  Lemma field_neg1_neq_0 : ~(- (1) == 0).
+  Proof.
+    intro. rewrite <- group_opp_0 in H at 1. apply group_opp_inj in H.
+    apply field_1_neq_0; auto.
+  Qed.
+  
+  (** ~(a == 0) -> a * b == a * c -> b == c *)
+  Lemma field_mul_cancel_l : forall a b c : A,
+      ~(a == 0) -> a * b == a * c -> b == c.
+  Proof.
+    intros.
+    assert (/a * (a * b) == /a * (a * c)).
+    { rewrite H0. easy. }
+    rewrite <- ?associative in H1.
+    rewrite field_mulInvL in H1; auto.
+    rewrite ?identityLeft in H1. easy.
+  Qed.
+
+  (** ~(c == 0) -> a * c == b * c -> a == b *)
+  Lemma field_mul_cancel_r : forall a b c : A,
+      ~(c == 0) -> a * c == b * c -> a == b.
+  Proof.
+    intros.
+    assert ((a * c) * /c == (b * c) * /c).
+    { rewrite H0. easy. }
+    rewrite ?associative in H1.
+    rewrite field_mulInvR in H1; auto.
+    rewrite ?identityRight in H1. easy.
+  Qed.
+
+  (** a * b == 1 -> / a == b *)
+  Lemma field_inv_eq_l : forall a b : A, ~(a == 0) -> a * b == 1 -> / a == b.
+  Proof.
+    intros. apply (@field_mul_cancel_l a (/ a) b); auto.
+    rewrite field_mulInvR; easy.
+  Qed.
+
+  (** a * b == 1 -> / b == a *)
+  Lemma field_inv_eq_r : forall a b : A, ~(b == 0) -> a * b == 1 -> / b == a.
+  Proof.
+    intros. apply (@field_mul_cancel_r (/ b) a b); auto.
+    rewrite field_mulInvL; auto. easy.
+  Qed.
+
+  (** / / a == a *)
+  Lemma field_inv_inv : forall a : A, ~(a == 0) -> / / a == a.
+  Proof.
+    intros. pose proof (field_inv_neq0_if_neq0 H).
+    apply field_mul_cancel_l with (/ a); auto.
+    rewrite field_mulInvL; auto. rewrite field_mulInvR; auto. easy.
+  Qed.
+
+  (** / a == / b -> a == b *)
+  Lemma field_inv_inj : forall a b : A, ~(a == 0) -> ~(b == 0) -> / a == / b -> a == b.
+  Proof.
+    intros. rewrite <- field_inv_inv; auto. rewrite H1.
+    rewrite field_inv_inv; auto. easy.
+  Qed.
+
+  (** / (- a) == - (/ a) *)
+  Lemma field_inv_opp : forall a : A, ~(a == 0) -> / (- a) == - (/ a).
+  Proof.
+    intros. apply field_inv_eq_l. apply group_opp_neq0_iff; auto.
+    rewrite ring_mul_opp_opp. apply field_mulInvR; auto.
+  Qed.
+
+  
+  Context {AeqDec : Dec Aeq}.
+  
+  (** a * b == 0 <-> a == 0 \/ b == 0 *)
+  Lemma field_mul_eq0_iff : forall a b : A, a * b == 0 <-> a == 0 \/ b == 0.
+  Proof.
+    intros. split; intros.
+    - destruct (dec a 0), (dec b 0); auto.
+      exfalso.
+      assert ((/a * a) * (b * /b) == /a * (a * b) * /b). field; auto.
+      rewrite H, field_mulInvL, field_mulInvR, identityLeft in H0; auto.
+      rewrite ring_mul_0_r in H0 at 1.
+      rewrite ring_mul_0_l in H0 at 1.
+      apply field_1_neq_0; auto.
+    - destruct H; rewrite H. ring. ring.
+  Qed.
+  
+  (** ~(a * b == 0) <-> (~(a == 0) /\ ~(b == 0)) *)
+  Lemma field_mul_neq0_iff : forall a b : A,
+      ~(a * b == 0) <-> (~(a == 0) /\ ~(b == 0)).
+  Proof. intros. rewrite field_mul_eq0_iff. tauto. Qed.
+    
+  (** ~(/ a == 0) -> ~(a == 0) *)
+  Lemma field_inv_neq0_imply_neq0 : forall a : A, ~(/ a == 0) -> ~(a == 0).
+  Proof.
+    intros. intro.
+    (* 备注：
+       1. 我暂时无法证明这个引理，但我可能要用到这个性质
+       2. 由反证法，若 a == 0，则 /a == 0，这应该不对。因为：
+          数学上，无穷小的倒数是无穷大。不过 0 还不是无穷小。
+       3. 在 Reals.RIneq 库中，有两个引理如下，我觉得好像有问题，但又无法指正。
+          Lemma Rinv_0 : / 0 == 0.
+          Lemma Rinv_inv r : / / r == r.
+       4. 主要问题是，/ 0 是没有定义的，但我的 Field 结构无法排除这种情况
+     *)
+  Admitted.
+
+  (** / ~(a == 0) <-> ~(a == 0) *)
+  Lemma field_inv_neq0_iff : forall a : A, ~(/ a == 0) <-> ~(a == 0).
+  Proof.
+    intros; split. apply field_inv_neq0_imply_neq0.
+    apply field_inv_neq0_if_neq0.
+  Qed.
+  
+  (** a * a == 0 -> a == 0 *)
+  Lemma field_sqr_eq0_reg : forall a : A, a * a == 0 -> a == 0.
+  Proof. intros. apply field_mul_eq0_iff in H. destruct H; auto. Qed.
+
+  (** a * b == b -> a == 1 \/ b == 0 *)
+  Lemma field_mul_eq_imply_a1_or_b0 : forall (a b : A),
+      a * b == b -> (a == 1) \/ (b == 0).
+  Proof.
+    intros. destruct (dec a 1), (dec b 0); auto.
+    setoid_replace b with (1 * b) in H at 2 by ring.
+    apply field_mul_cancel_r in H; auto.
+  Qed.
+
+End Theory.
+
+(** ** Instances *)
+
+(** ** Examples *)
+
+
+(* ######################################################################### *)
 (** * Total order relations *)
 
 (* ref : 
@@ -2183,7 +2364,6 @@ Section eq.
 
   #[export] Instance eq_Dec : Dec Aeq.
   Proof. constructor. intro. apply eq_dec. Defined.
-
 End eq.
 
 
@@ -2228,7 +2408,6 @@ Section lt.
   (** a < b -> ~ (b < a) *)
   Lemma lt_not_lt : forall a b : A, a < b -> ~ (b < a).
   Proof. intros. intro. apply lt_gt_contr in H; auto. Qed.
-
 End lt.
 
 
@@ -2351,12 +2530,55 @@ Section le.
   (** a <= b \/ b < a *)
   Lemma le_connected : forall a b : A, a <= b \/ b < a.
   Proof. intros. destruct (le_dec a b); auto. apply not_le_lt in n. auto. Qed.
-
 End le.
+
+(** Simplify expressions on Order {==, <, <=} *)
+Ltac order_core aeq lt le :=
+  intros;
+  repeat
+    (try
+       match goal with
+       (* |- {a == b} + {~(a == b)}. *)
+       | H: Order aeq lt le |- {aeq ?a ?b} + {~(aeq ?a ?b)} => apply eq_dec
+       (* |- {a < b} + {~(a < b)}. *)
+       | H: Order aeq lt le |- {lt ?a ?b} + {~(lt ?a ?b)} => apply lt_dec
+       (* |- {a <= b} + {~(a <= b)} *)
+       | H: Order aeq lt le |- {le ?a ?b} + {~(le ?a ?b)} => apply le_dec
+       (* |- a <= a *)
+       | H: Order aeq lt le |- le ?a ?a => apply le_refl
+       (* |- ~(a < a) *)
+       | H: Order aeq lt le |- ~(lt ?a ?a) => apply lt_irrefl
+       (* ~(a == b), a <= b |- a < b *)
+       | H: Order aeq lt le, H1: ~(aeq ?a ?b), H2: le ?a ?b |- lt ?a ?b =>
+           apply lt_if_le_and_neq
+       end;
+     try easy).
+
+(** Simplify expressions on Order in current context *)
+Ltac order :=
+  match goal with
+  | H: Order ?aeq ?lt ?le |- _ => order_core aeq lt le
+  end.
 
 (** ** Instances *)
 
 (** ** Examples *)
+Section test.
+  Context `{Order}.
+  Infix "==" := Aeq : A_scope.
+  Infix "<" := Alt : A_scope.
+  Infix "<=" := Ale : A_scope.
+
+  Variable a b c d e f g : A.
+
+  Goal {a == b} + {~(a == b)}. order. Qed.
+  Goal {a < b} + {~(a < b)}. order. Qed.
+  Goal {a <= b} + {~(a <= b)}. order. Qed.
+  Goal a <= a. order. Qed.
+  Goal ~(a < a). order. Qed.
+  Goal ~(a == b) -> a <= b -> a < b. order. Qed.
+
+End test.
 
 
 (* ######################################################################### *)
@@ -2850,232 +3072,6 @@ End theories.
 
 
 (* ######################################################################### *)
-(** * Field *)
-
-(** ** Class *)
-Class Field {A} Aadd (Azero:A) Aopp Amul Aone Ainv Aeq := {
-    fieldRing :: ARing Aadd Azero Aopp Amul Aone Aeq;
-    fieldAinvProper :: Proper (Aeq ==> Aeq) Ainv;
-    field_mulInvL : forall a, ~(Aeq a Azero) -> Aeq (Amul (Ainv a) a) Aone;
-    field_1_neq_0 : ~(Aeq Aone Azero);
-    
-    (* Tips: 也许还遗漏了一个条件，即：0 没有逆元。一个可能的方案如下：
-       If we have "/0", then prove anything *)
-    (* field_inv0_False : { x : A | x = Ainv Azero } -> False *)
-
-    (* But, this is a bad idea. Because there exist "/0" in R.
-       Rinv_0: / 0 = 0
-       I can't deal with "/0" perfectly right now. *)
-  }.
-Coercion fieldRing : Field >-> ARing.
-
-(** ** Theories *)
-
-(** make a `field_theory` from `Field` *)
-Lemma make_field_theory `(HField : Field)
-  : field_theory Azero Aone Aadd Amul
-      (fun x y => Aadd x (Aopp y)) Aopp
-      (fun x y => Amul x (Ainv y)) Ainv Aeq.
-  Proof.
-    constructor; intros;
-      try (rewrite ?identityLeft,?associative; reflexivity);
-      try (rewrite commutative; reflexivity).
-    apply (make_ring_theory fieldRing).
-    apply field_1_neq_0.
-    apply field_mulInvL. auto.
- Qed.
-
-Section Theory.
-  Context `{HField : Field}.
-  Add Field field_inst : (make_field_theory HField).
-
-  Infix "==" := Aeq.
-  Infix "+" := Aadd.
-  Notation "- a" := (Aopp a).
-  Notation Asub a b := (a + -b).
-  Notation "0" := Azero.
-  Notation "1" := Aone.
-  Infix "*" := Amul.
-  Notation "/ a" := (Ainv a).
-  Notation Adiv a b := (a * (/b)).
-  Infix "/" := Adiv.
-
-  (** ~(a == 0) -> a * / a == 1 *)
-  Lemma field_mulInvR : forall a : A, ~(a == 0) -> a * /a == 1.
-  Proof. intros. rewrite commutative. rewrite field_mulInvL; easy. Qed.
-
-  (** ~(a == 0) -> (1/a) * a == 1 *)
-  Lemma field_mulInvL_inv1 : forall a : A, ~(a == 0) -> (1/a) * a == 1.
-  Proof. intros. simpl. field; auto. Qed.
-  
-  (** ~(a == 0) -> a * (1/a) == 1 *)
-  Lemma field_mulInvR_inv1 : forall a : A, ~(a == 0) -> a * (1/a) == 1.
-  Proof. intros. simpl. field. auto. Qed.
-
-  (** ~(a == 0) -> / ~(a == 0) *)
-  Lemma field_inv_neq0_if_neq0 : forall a : A, ~(a == 0) -> ~(/ a == 0).
-  Proof.
-    intros. intro.
-    pose proof (field_mulInvL H). rewrite H0 in H1. rewrite ring_mul_0_l in H1.
-    apply field_1_neq_0. easy.
-  Qed.
-
-  (** ~(- 1 == 0) *)
-  Lemma field_neg1_neq_0 : ~(- (1) == 0).
-  Proof.
-    intro. rewrite <- group_opp_0 in H at 1. apply group_opp_inj in H.
-    apply field_1_neq_0; auto.
-  Qed.
-  
-  (** ~(a == 0) -> a * b == a * c -> b == c *)
-  Lemma field_mul_cancel_l : forall a b c : A,
-      ~(a == 0) -> a * b == a * c -> b == c.
-  Proof.
-    intros.
-    assert (/a * (a * b) == /a * (a * c)).
-    { rewrite H0. easy. }
-    rewrite <- ?associative in H1.
-    rewrite field_mulInvL in H1; auto.
-    rewrite ?identityLeft in H1. easy.
-  Qed.
-
-  (** ~(c == 0) -> a * c == b * c -> a == b *)
-  Lemma field_mul_cancel_r : forall a b c : A,
-      ~(c == 0) -> a * c == b * c -> a == b.
-  Proof.
-    intros.
-    assert ((a * c) * /c == (b * c) * /c).
-    { rewrite H0. easy. }
-    rewrite ?associative in H1.
-    rewrite field_mulInvR in H1; auto.
-    rewrite ?identityRight in H1. easy.
-  Qed.
-
-  (** a * b == 1 -> / a == b *)
-  Lemma field_inv_eq_l : forall a b : A, ~(a == 0) -> a * b == 1 -> / a == b.
-  Proof.
-    intros. apply (@field_mul_cancel_l a (/ a) b); auto.
-    rewrite field_mulInvR; easy.
-  Qed.
-
-  (** a * b == 1 -> / b == a *)
-  Lemma field_inv_eq_r : forall a b : A, ~(b == 0) -> a * b == 1 -> / b == a.
-  Proof.
-    intros. apply (@field_mul_cancel_r (/ b) a b); auto.
-    rewrite field_mulInvL; auto. easy.
-  Qed.
-
-  (** / / a == a *)
-  Lemma field_inv_inv : forall a : A, ~(a == 0) -> / / a == a.
-  Proof.
-    intros. pose proof (field_inv_neq0_if_neq0 H).
-    apply field_mul_cancel_l with (/ a); auto.
-    rewrite field_mulInvL; auto. rewrite field_mulInvR; auto. easy.
-  Qed.
-
-  (** / a == / b -> a == b *)
-  Lemma field_inv_inj : forall a b : A, ~(a == 0) -> ~(b == 0) -> / a == / b -> a == b.
-  Proof.
-    intros. rewrite <- field_inv_inv; auto. rewrite H1.
-    rewrite field_inv_inv; auto. easy.
-  Qed.
-
-  (** / (- a) == - (/ a) *)
-  Lemma field_inv_opp : forall a : A, ~(a == 0) -> / (- a) == - (/ a).
-  Proof.
-    intros. apply field_inv_eq_l. apply group_opp_neq0_iff; auto.
-    rewrite ring_mul_opp_opp. apply field_mulInvR; auto.
-  Qed.
-
-  
-  Context {AeqDec : Dec Aeq}.
-  
-  (** a * b == 0 <-> a == 0 \/ b == 0 *)
-  Lemma field_mul_eq0_iff : forall a b : A, a * b == 0 <-> a == 0 \/ b == 0.
-  Proof.
-    intros. split; intros.
-    - destruct (dec _ a 0), (dec _ b 0); auto.
-      exfalso.
-      assert ((/a * a) * (b * /b) == /a * (a * b) * /b). field; auto.
-      rewrite H, field_mulInvL, field_mulInvR, identityLeft in H0; auto.
-      rewrite ring_mul_0_r in H0 at 1.
-      rewrite ring_mul_0_l in H0 at 1.
-      apply field_1_neq_0; auto.
-    - destruct H; rewrite H. ring. ring.
-  Qed.
-  
-  (** ~(a * b == 0) <-> (~(a == 0) /\ ~(b == 0)) *)
-  Lemma field_mul_neq0_iff : forall a b : A,
-      ~(a * b == 0) <-> (~(a == 0) /\ ~(b == 0)).
-  Proof. intros. rewrite field_mul_eq0_iff. tauto. Qed.
-    
-  (** ~(/ a == 0) -> ~(a == 0) *)
-  Lemma field_inv_neq0_imply_neq0 : forall a : A, ~(/ a == 0) -> ~(a == 0).
-  Proof.
-    intros. intro.
-    (* 备注：
-       1. 我暂时无法证明这个引理，但我可能要用到这个性质
-       2. 由反证法，若 a == 0，则 /a == 0，这应该不对。因为：
-          数学上，无穷小的倒数是无穷大。不过 0 还不是无穷小。
-       3. 在 Reals.RIneq 库中，有两个引理如下，我觉得好像有问题，但又无法指正。
-          Lemma Rinv_0 : / 0 == 0.
-          Lemma Rinv_inv r : / / r == r.
-       4. 主要问题是，/ 0 是没有定义的，但我的 Field 结构无法排除这种情况
-     *)
-  Admitted.
-
-  (** / ~(a == 0) <-> ~(a == 0) *)
-  Lemma field_inv_neq0_iff : forall a : A, ~(/ a == 0) <-> ~(a == 0).
-  Proof.
-    intros; split. apply field_inv_neq0_imply_neq0.
-    apply field_inv_neq0_if_neq0.
-  Qed.
-  
-  (** a * a == 0 -> a == 0 *)
-  Lemma field_sqr_eq0_reg : forall a : A, a * a == 0 -> a == 0.
-  Proof. intros. apply field_mul_eq0_iff in H. destruct H; auto. Qed.
-
-  (** a * b == b -> a == 1 \/ b == 0 *)
-  Lemma field_mul_eq_imply_a1_or_b0 : forall (a b : A),
-      a * b == b -> (a == 1) \/ (b == 0).
-  Proof.
-    intros. destruct (dec _ a 1), (dec _ b 0); auto.
-    setoid_replace b with (1 * b) in H at 2 by ring.
-    apply field_mul_cancel_r in H; auto.
-  Qed.
-
-End Theory.
-
-(** ** Instances *)
-(* Section Instances. *)
-
-(*   Import Qcanon Reals. *)
-  
-(*   #[export] Instance Field_Qc : Field Qcplus 0 Qcopp Qcmult 1 Qcinv eq. *)
-(*   split_intro; subst; (try (field; reflexivity)); try easy. *)
-(*   field. auto. *)
-(*   Qed. *)
-
-(*   #[export] Instance Field_R : Field Rplus R0 Ropp Rmult R1 Rinv eq. *)
-(*   split_intro; subst; try (field; reflexivity); auto. *)
-(*   field; auto. auto with real. *)
-(*   Qed. *)
-
-(* End Instances. *)
-
-(** ** Examples *)
-(* Section Examples. *)
-
-(*   Import Reals. *)
-(*   Open Scope R_scope. *)
-  
-(*   Goal forall a b : R, a <> 0 -> /a * a = 1. *)
-(*   Proof. intros. apply field_mulInvL. auto. Qed. *)
-
-(* End Examples. *)
-
-
-(* ######################################################################### *)
 (** * Field with total order *)
 
 Class OrderedField {A} Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale := {
@@ -3202,8 +3198,8 @@ End Theory.
 (* ######################################################################### *)
 (** * Convert to R type *)
 
-(** "a2r: A -> R" is consistent with {+,0,-x,*,1,/x,==,<,<=}  *)
-Class ConvertToR {A} Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale (a2r : A -> R)
+(** Operations {+,0,-x,*,1,/x,==,<,<=} is consistent with "a2r: A -> R" *)
+Class A2R {A} Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale (a2r : A -> R)
   := {
     (* a2r (a + b) = a2r a + a2r b *)
     a2r_add : forall a b : A, a2r (Aadd a b) = (a2r a + a2r b)%R;
@@ -3229,7 +3225,7 @@ Class ConvertToR {A} Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale (a2r : A -> R)
 
 (** ** Theories *)
 Section Theory.
-  Context `{HConvertToR : ConvertToR}.
+  Context `{HA2R : A2R}.
   Infix "==" := Aeq : A_scope.
   Notation "0" := Azero : A_scope.
   Notation "1" := Aone : A_scope.

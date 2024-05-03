@@ -67,7 +67,9 @@ Reserved Infix    "??<="   (at level 70).           (* decidable procedure for "
 Reserved Infix    "??>="   (at level 70).           (* decidable procedure for ">=" *)
 
 Reserved Infix    "=="      (at level 70, no associativity).      (* equiv *)
-Reserved Notation "a != b"  (at level 70, no associativity).      (* not equiv *)
+Reserved Infix    "=A="     (at level 70, no associativity).     (* equiv of Aeq *)
+Reserved Infix    "=B="     (at level 70, no associativity).     (* equiv of Beq *)
+Reserved Infix    "=C="     (at level 70, no associativity).     (* equiv of Beq *)
 
 (* ****************************************************** *)
 (* The precedence ∈ [30,60) are vector/matrix operations *)
