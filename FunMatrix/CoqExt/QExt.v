@@ -9,7 +9,7 @@
 *)
 
 
-Require Export ZExt.
+Require Export HierarchySetoid.  
 Require Export QArith Qround.
 Open Scope Q.
 
@@ -45,35 +45,35 @@ Defined.
 
 (** Associative *)
 
-#[export] Instance Qadd_Assoc : Associative Qplus Qeq.
+#[export] Instance Qadd_Assoc : Associative Qeq Qplus.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qmul_Assoc : Associative Qmult Qeq.
+#[export] Instance Qmul_Assoc : Associative Qeq Qmult.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve Qadd_Assoc Qmul_Assoc : Q.
 
 (** Commutative *)
 
-#[export] Instance Qadd_Comm : Commutative Qplus Qeq.
+#[export] Instance Qadd_Comm : Commutative Qeq Qplus.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qmul_Comm : Commutative Qmult Qeq.
+#[export] Instance Qmul_Comm : Commutative Qeq Qmult.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve Qadd_Comm Qmul_Comm : Q.
 
 (** Identity Left/Right *)
-#[export] Instance Qadd_IdL : IdentityLeft Qplus 0 Qeq.
+#[export] Instance Qadd_IdL : IdentityLeft Qeq Qplus 0.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qadd_IdR : IdentityRight Qplus 0 Qeq.
+#[export] Instance Qadd_IdR : IdentityRight Qeq Qplus 0.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qmul_IdL : IdentityLeft Qmult 1 Qeq.
+#[export] Instance Qmul_IdL : IdentityLeft Qeq Qmult 1.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qmul_IdR : IdentityRight Qmult 1 Qeq.
+#[export] Instance Qmul_IdR : IdentityRight Qeq Qmult 1.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve
@@ -82,20 +82,20 @@ Hint Resolve
 
 (** Inverse Left/Right *)
 
-#[export] Instance Qadd_InvL : InverseLeft Qplus 0 Qopp Qeq.
+#[export] Instance Qadd_InvL : InverseLeft Qeq Qplus 0 Qopp.
 Proof. constructor; intros; ring. Qed.
 
-#[export] Instance Qadd_InvR : InverseRight Qplus 0 Qopp Qeq.
+#[export] Instance Qadd_InvR : InverseRight Qeq Qplus 0 Qopp.
 Proof. constructor; intros; ring. Qed.
 
 Hint Resolve Qadd_InvL Qadd_InvR : Q.
 
 (** Distributive *)
 
-#[export] Instance Qmul_add_DistrL : DistrLeft Qplus Qmult Qeq.
+#[export] Instance Qmul_add_DistrL : DistrLeft Qeq Qplus Qmult.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qmul_add_DistrR : DistrRight Qplus Qmult Qeq.
+#[export] Instance Qmul_add_DistrR : DistrRight Qeq Qplus Qmult.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve
@@ -105,10 +105,10 @@ Hint Resolve
 
 (** Semigroup *)
 
-#[export] Instance Qadd_SGroup : SGroup Qplus Qeq.
+#[export] Instance Qadd_SGroup : SGroup Qeq Qplus.
 Proof. constructor; auto with Q. Qed.
 
-#[export] Instance Qmul_SGroup : SGroup Qmult Qeq.
+#[export] Instance Qmul_SGroup : SGroup Qeq Qmult.
 Proof. constructor; auto with Q. Qed.
 
 Hint Resolve
@@ -118,10 +118,10 @@ Hint Resolve
 
 (** Abelian semigroup *)
 
-#[export] Instance Qadd_ASGroup : ASGroup Qplus Qeq.
+#[export] Instance Qadd_ASGroup : ASGroup Qeq Qplus.
 Proof. constructor; auto with Q. Qed.
 
-#[export] Instance Qmul_ASGroup : ASGroup Qmult Qeq.
+#[export] Instance Qmul_ASGroup : ASGroup Qeq Qmult.
 Proof. constructor; auto with Q. Qed.
 
 Hint Resolve
@@ -131,10 +131,10 @@ Hint Resolve
 
 (** Monoid *)
   
-#[export] Instance Qadd_Monoid : Monoid Qplus 0 Qeq.
+#[export] Instance Qadd_Monoid : Monoid Qeq Qplus 0.
 Proof. constructor; auto with Q. Qed.
 
-#[export] Instance Qmul_Monoid : Monoid Qmult 1 Qeq.
+#[export] Instance Qmul_Monoid : Monoid Qeq Qmult 1.
 Proof. constructor; auto with Q. Qed.
 
 Hint Resolve
@@ -144,45 +144,45 @@ Hint Resolve
 
 (** Abelian monoid *)
   
-#[export] Instance Qadd_AMonoid : AMonoid Qplus 0 Qeq.
+#[export] Instance Qadd_AMonoid : AMonoid Qeq Qplus 0.
 Proof. constructor; auto with Q. Qed.
   
-#[export] Instance Qmul_AMonoid : AMonoid Qmult 1 Qeq.
+#[export] Instance Qmul_AMonoid : AMonoid Qeq Qmult 1.
 Proof. constructor; auto with Q. Qed.
 
 Hint Resolve Qadd_AMonoid Qmul_AMonoid : Q.
 
 (** Group *)
 
-#[export] Instance Qadd_Group : Group Qplus 0 Qopp Qeq.
+#[export] Instance Qadd_Group : Group Qeq Qplus 0 Qopp.
 Proof. constructor; auto with Q. Qed.
 
 Hint Resolve Qadd_Group : Q.
 
 (** AGroup *)
 
-#[export] Instance Qadd_AGroup : AGroup Qplus 0 Qopp Qeq.
+#[export] Instance Qadd_AGroup : AGroup Qeq Qplus 0 Qopp.
 Proof. constructor; auto with Q. Qed.
 
 Hint Resolve Qadd_AGroup : Q.
 
 (** Ring *)
 
-#[export] Instance Q_Ring : Ring Qplus 0 Qopp Qmult 1 Qeq.
+#[export] Instance Q_Ring : Ring Qeq Qplus 0 Qopp Qmult 1.
 Proof. constructor; auto with Q. Qed.
 
 Hint Resolve Q_Ring : Q.
 
 (** ARing *)
 
-#[export] Instance Q_ARing : ARing Qplus 0 Qopp Qmult 1 Qeq.
+#[export] Instance Q_ARing : ARing Qeq Qplus 0 Qopp Qmult 1.
 Proof. constructor; auto with Q. Qed.
 
 Hint Resolve Q_ARing : Q.
 
 (** Field *)
 
-#[export] Instance Q_Field : Field Qplus 0 Qopp Qmult 1 Qinv Qeq.
+#[export] Instance Q_Field : Field Qeq Qplus 0 Qopp Qmult 1 Qinv.
 Proof.
   constructor; auto with Q.
   - intros. field; auto.

@@ -9,6 +9,7 @@
 *)
 
 
+Require Export HierarchySetoid.
 Require Export QExt.
 Require Export Qcanon.
 Open Scope Qc.
@@ -63,36 +64,36 @@ Defined.
 
 (** Associative *)
 
-#[export] Instance Qcadd_Assoc : Associative Qcplus eq.
+#[export] Instance Qcadd_Assoc : Associative eq Qcplus.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qcmul_Assoc : Associative Qcmult eq.
+#[export] Instance Qcmul_Assoc : Associative eq Qcmult.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve Qcadd_Assoc Qcmul_Assoc : Qc.
 
 (** Commutative *)
 
-#[export] Instance Qcadd_Comm : Commutative Qcplus eq.
+#[export] Instance Qcadd_Comm : Commutative eq Qcplus.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qcmul_Comm : Commutative Qcmult eq.
+#[export] Instance Qcmul_Comm : Commutative eq Qcmult.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve Qcadd_Comm Qcmul_Comm : Qc.
 
 (** Identity Left/Right *)
 
-#[export] Instance Qcadd_IdL : IdentityLeft Qcplus 0 eq.
+#[export] Instance Qcadd_IdL : IdentityLeft eq Qcplus 0.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qcadd_IdR : IdentityRight Qcplus 0 eq.
+#[export] Instance Qcadd_IdR : IdentityRight eq Qcplus 0.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qcmul_IdL : IdentityLeft Qcmult 1 eq.
+#[export] Instance Qcmul_IdL : IdentityLeft eq Qcmult 1.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qcmul_IdR : IdentityRight Qcmult 1 eq.
+#[export] Instance Qcmul_IdR : IdentityRight eq Qcmult 1.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve
@@ -101,20 +102,20 @@ Hint Resolve
 
 (** Inverse Left/Right *)
 
-#[export] Instance Qcadd_InvL : InverseLeft Qcplus 0 Qcopp eq.
+#[export] Instance Qcadd_InvL : InverseLeft eq Qcplus 0 Qcopp.
 Proof. constructor; intros; ring. Qed.
 
-#[export] Instance Qcadd_InvR : InverseRight Qcplus 0 Qcopp eq.
+#[export] Instance Qcadd_InvR : InverseRight eq Qcplus 0 Qcopp.
 Proof. constructor; intros; ring. Qed.
 
 Hint Resolve Qcadd_InvL Qcadd_InvR : Qc.
 
 (** Distributive *)
 
-#[export] Instance Qcmul_add_DistrL : DistrLeft Qcplus Qcmult eq.
+#[export] Instance Qcmul_add_DistrL : DistrLeft eq Qcplus Qcmult.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Qcmul_add_DistrR : DistrRight Qcplus Qcmult eq.
+#[export] Instance Qcmul_add_DistrR : DistrRight eq Qcplus Qcmult.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve
@@ -124,10 +125,10 @@ Hint Resolve
 
 (** Semigroup *)
 
-#[export] Instance Qcadd_SGroup : SGroup Qcplus eq.
+#[export] Instance Qcadd_SGroup : SGroup eq Qcplus.
 Proof. constructor; auto with Qc. Qed.
 
-#[export] Instance Qcmul_SGroup : SGroup Qcmult eq.
+#[export] Instance Qcmul_SGroup : SGroup eq Qcmult.
 Proof. constructor; auto with Qc. Qed.
 
 Hint Resolve
@@ -137,10 +138,10 @@ Hint Resolve
 
 (** Abelian semigroup *)
 
-#[export] Instance Qcadd_ASGroup : ASGroup Qcplus eq.
+#[export] Instance Qcadd_ASGroup : ASGroup eq Qcplus.
 Proof. constructor; auto with Qc. Qed.
 
-#[export] Instance Qcmul_ASGroup : ASGroup Qcmult eq.
+#[export] Instance Qcmul_ASGroup : ASGroup eq Qcmult.
 Proof. constructor; auto with Qc. Qed.
 
 Hint Resolve
@@ -150,10 +151,10 @@ Hint Resolve
 
 (** Monoid *)
   
-#[export] Instance Qcadd_Monoid : Monoid Qcplus 0 eq.
+#[export] Instance Qcadd_Monoid : Monoid eq Qcplus 0.
 Proof. constructor; auto with Qc. Qed.
 
-#[export] Instance Qcmul_Monoid : Monoid Qcmult 1 eq.
+#[export] Instance Qcmul_Monoid : Monoid eq Qcmult 1.
 Proof. constructor; auto with Qc. Qed.
 
 Hint Resolve
@@ -163,45 +164,45 @@ Hint Resolve
 
 (** Abelian monoid *)
   
-#[export] Instance Qcadd_AMonoid : AMonoid Qcplus 0 eq.
+#[export] Instance Qcadd_AMonoid : AMonoid eq Qcplus 0.
 Proof. constructor; auto with Qc. Qed.
   
-#[export] Instance Qcmul_AMonoid : AMonoid Qcmult 1 eq.
+#[export] Instance Qcmul_AMonoid : AMonoid eq Qcmult 1.
 Proof. constructor; auto with Qc. Qed.
 
 Hint Resolve Qcadd_AMonoid Qcmul_AMonoid : Qc.
 
 (** Group *)
 
-#[export] Instance Qcadd_Group : Group Qcplus 0 Qcopp eq.
+#[export] Instance Qcadd_Group : Group eq Qcplus 0 Qcopp.
 Proof. constructor; auto with Qc. Qed.
 
 Hint Resolve Qcadd_Group : Qc.
 
 (** AGroup *)
 
-#[export] Instance Qcadd_AGroup : AGroup Qcplus 0 Qcopp eq.
+#[export] Instance Qcadd_AGroup : AGroup eq Qcplus 0 Qcopp.
 Proof. constructor; auto with Qc. Qed.
 
 Hint Resolve Qcadd_AGroup : Qc.
 
 (** Ring *)
 
-#[export] Instance Qc_Ring : Ring Qcplus 0 Qcopp Qcmult 1 eq.
+#[export] Instance Qc_Ring : Ring eq Qcplus 0 Qcopp Qcmult 1.
 Proof. constructor; auto with Qc. Qed.
 
 Hint Resolve Qc_Ring : Qc.
 
 (** ARing *)
 
-#[export] Instance Qc_ARing : ARing Qcplus 0 Qcopp Qcmult 1 eq.
+#[export] Instance Qc_ARing : ARing eq Qcplus 0 Qcopp Qcmult 1.
 Proof. constructor; auto with Qc. Qed.
 
 Hint Resolve Qc_ARing : Qc.
 
 (** Field *)
 
-#[export] Instance Qc_Field : Field Qcplus 0 Qcopp Qcmult 1 Qcinv eq.
+#[export] Instance Qc_Field : Field eq Qcplus 0 Qcopp Qcmult 1 Qcinv.
 Proof.
   constructor; auto with Qc.
   - intros. field; auto.
@@ -244,8 +245,7 @@ Section eq.
        canon : Qred this = this }.
 
      Here, canon is a proof of equality, so its unique by the help of UIP.
-     Then, only need the "this" component equal.
-   *)
+     Then, only need the "this" component equal. *)
   Goal Q2Qc (1#2) = Q2Qc (2#4).
   Proof. cbv. f_equal. apply UIP. Qed.
 End eq.

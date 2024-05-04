@@ -125,7 +125,7 @@ Section cons.
   Infix "==" := (eqlistA Aeq) : list_scope.
 
   (** cons is a proper morphism *)
-  #[export] Instance cons_aeq : Proper (Aeq ==> eqlistA Aeq ==> eqlistA Aeq) (@cons A).
+  #[export] Instance cons_wd : Proper (Aeq ==> eqlistA Aeq ==> eqlistA Aeq) (@cons A).
   Proof. simp_proper; intros. destruct x0,y0; auto. Qed.
 
   (** Equality of cons, iff both parts are equal *)
@@ -230,7 +230,7 @@ Section repeat.
   Infix "==" := Aeq : A_scope.
   Infix "==" := (eqlistA Aeq) : list_scope.
 
-  #[export] Instance repeat_aeq : Proper (Aeq ==> eq ==> eqlistA Aeq) (@repeat A).
+  #[export] Instance repeat_wd : Proper (Aeq ==> eq ==> eqlistA Aeq) (@repeat A).
   Proof.
     simp_proper. intros. subst. rename y0 into n.
     induction n; simpl; try easy. f_equiv; auto.
@@ -256,11 +256,11 @@ Section hd_tl.
   Infix "==" := (eqlistA Aeq) : list_scope.
 
   (** hd is a proper morphism *)
-  #[export] Instance hd_aeq : Proper (Aeq ==> eqlistA Aeq ==> Aeq) (@hd A).
+  #[export] Instance hd_wd : Proper (Aeq ==> eqlistA Aeq ==> Aeq) (@hd A).
   Proof. simp_proper; intros. destruct x0,y0; simpl; try easy. inv H0; auto. Qed.
   
   (** tl is a proper morphism *)
-  #[export] Instance tl_aeq : Proper (eqlistA Aeq ==> eqlistA Aeq) (@tl A).
+  #[export] Instance tl_wd : Proper (eqlistA Aeq ==> eqlistA Aeq) (@tl A).
   Proof. simp_proper; intros. destruct x,y; simpl; try easy. inv H; auto. Qed.
   
   Context {Azero : A}.
@@ -281,7 +281,7 @@ Section nth.
   Infix "==" := (eqlistA Aeq) : list_scope.
   
   (** nth is a proper morphism *)
-  #[export] Instance nth_aeq : Proper (eq ==> eqlistA Aeq ==> Aeq ==> Aeq) (@nth A).
+  #[export] Instance nth_wd : Proper (eq ==> eqlistA Aeq ==> Aeq ==> Aeq) (@nth A).
   Proof.
     simp_proper. intros i j H. inv H. rename j into i. intros l1 l2. revert l2 i.
     induction l1; destruct l2,i; intros; simpl in *; try easy.
@@ -386,7 +386,7 @@ Section fold_left.
   Notation "0" := Azero : A_scope.
 
   (** fold_left is a proper relation *)
-  #[export] Instance fold_left_aeq :
+  #[export] Instance fold_left_wd :
     Proper (eqlistA Aeq ==> Aeq ==> Aeq) (fold_left Aadd).
   Proof.
     intros l1. induction l1; intros l2 Hl a1 a2 Ha.
@@ -394,7 +394,7 @@ Section fold_left.
     - destruct l2. easy. inv Hl. simpl. apply IHl1; auto. rewrite Ha,H2. easy.
   Qed.
   
-  Context `{HAMonoid:AMonoid A Aadd 0 Aeq}.
+  Context `{HAMonoid:AMonoid A Aeq Aadd 0}.
   
   Lemma fold_left_rebase_l : forall (l : list A) a b,
       (fold_left Aadd l (a + b) == (fold_left Aadd l a) + b)%A.
@@ -433,7 +433,7 @@ Section fold_left.
     - intros. specialize (H2 (S i)); simpl in H2. apply H2. lia.
   Qed.
 
-  Context `{HGroup:Group A Aadd 0 Aopp Aeq}.
+  Context `{HGroup:Group A Aeq Aadd 0 Aopp}.
   
   (** (-a1)+(-a2)+... == -(a1+a2+...) *)
   Lemma fold_left_opp : forall (l1 l2 : list A) n,
@@ -450,7 +450,7 @@ Section fold_left.
     - intros. specialize (H1 (S i)). simpl in H1. apply H1. lia.
   Qed.
 
-  Context `{HARing : ARing A Aadd 0 Aopp Amul Aone Aeq}.
+  Context `{HARing : ARing A Aeq Aadd 0 Aopp Amul Aone}.
   Add Ring ring_inst : (make_ring_theory HARing).
   Infix "*" := Amul : A_scope.
 
@@ -484,7 +484,7 @@ Section fold_right.
   Notation "0" := Azero : A_scope.
 
   (** fold_right is a proper relation *)
-  #[export] Instance fold_right_aeq :
+  #[export] Instance fold_right_wd :
     Proper (Aeq ==> eqlistA Aeq ==> Aeq) (fold_right Aadd).
   Proof.
     intros x y Hxy l1 l2. revert l2 x y Hxy.
@@ -492,7 +492,7 @@ Section fold_right.
     rewrite H3. rewrite (IHl1 l2 x y); auto. easy.
   Qed.
   
-  Context `{HAMonoid:AMonoid A Aadd 0 Aeq}.
+  Context `{HAMonoid:AMonoid A Aeq Aadd 0}.
   
   Lemma fold_right_rebase_l : forall (l : list A) a b,
       (fold_right Aadd (a + b) l == b + (fold_right Aadd a l))%A.
@@ -523,7 +523,7 @@ Section fold_right.
     - intros. specialize (H2 (S i)); simpl in H2. rewrite H2; try easy. lia.
   Qed.
 
-  Context `{HGroup:Group A Aadd 0 Aopp Aeq}.
+  Context `{HGroup:Group A Aeq Aadd 0 Aopp}.
 
   (** (-a1)+(-a2)+... = -(a1+a2+...) *)
   Lemma fold_right_opp : forall (l1 l2 : list A) n,
@@ -538,7 +538,7 @@ Section fold_right.
     - intros. specialize (H1 (S i)); simpl in H1. rewrite H1; try easy. lia.
   Qed.
 
-  Context `{HARing:ARing A Aadd 0 Aopp Amul Aone Aeq}.
+  Context `{HARing:ARing A Aeq Aadd 0 Aopp Amul Aone}.
   Add Ring ring_inst : (make_ring_theory HARing).
   Infix "*" := Amul : A_scope.
 
@@ -556,6 +556,32 @@ Section fold_right.
   Qed.
 
 End fold_right.
+
+
+(* ===================================================================== *)
+(** ** Generalized Associative Law *)
+Section generalized_associative.
+  Context `{AMonoid}.
+
+  Infix "==" := Aeq : A_scope.
+  Infix "+" := Aadd : A_scope.
+  Notation "0" := Azero : A_scope.
+  Notation "'\sum' a '&' l " := (fold_left Aadd l a) (at level 10).
+  
+  (** Generalized Associative Law *)
+  (* i.e., given two expressions a1+a2+... and b1+b2+..., then 
+      (a1+a2+...) + (b1+b2+...) = a1+a2+...+b1+b2+...
+     It shows the associative law in a general case (not limited 3 terms) *)
+  Lemma assoc_law : forall (l1 l2 : list A),
+      \sum 0 & l1 + \sum 0 & l2 == \sum 0 & (l1 ++ l2).
+  Proof.
+    induction l1, l2; simpl; amonoid.
+    - rewrite app_nil_r. easy.
+    - setoid_replace a with (0 + a) by monoid.
+      rewrite !fold_left_rebase_l.
+      rewrite <- IHl1. simpl. amonoid.
+  Qed.
+End generalized_associative.
 
 
 (* ===================================================================== *)
@@ -688,7 +714,7 @@ Section map_A_B.
   Infix "=B=" := (eqlistA Beq) : list_scope.
 
   (** map is a proper morphism *)
-  #[export] Instance map_aeq :
+  #[export] Instance map_wd :
     Proper ((Aeq ==> Beq) ==> eqlistA Aeq ==> eqlistA Beq) (@map A B).
   Proof.
     simp_proper. intros f g Hfg l1 l2. revert l2.
@@ -872,7 +898,7 @@ Section map2.
   Infix "=C=" := Ceq : A_scope.
   Infix "=C=" := (eqlistA Ceq) : list_scope.
   Context (f : A -> B -> C).
-  Context (fProper : Proper (Aeq ==> Beq ==> Ceq) f).
+  Context (f_wd : Proper (Aeq ==> Beq ==> Ceq) f).
   
   (** map operation to two list *)
   Fixpoint map2 (l1 : list A) (l2 : list B) : list C :=
@@ -881,13 +907,13 @@ Section map2.
     | _, _ => []
     end.
 
-  #[export] Instance map2_aeq : Proper (eqlistA Aeq ==> eqlistA Beq ==> eqlistA Ceq) map2.
+  #[export] Instance map2_wd : Proper (eqlistA Aeq ==> eqlistA Beq ==> eqlistA Ceq) map2.
   Proof.
     intros a1. induction a1.
     - intros a2 Ha b1 b2 Hb. destruct b1,a2,b2; try easy.
     - intros a2 Ha b1 b2 Hb. destruct b1,a2,b2; try easy.
       simpl. inversion Ha. inversion Hb. subst. f_equiv.
-      + apply fProper; auto.
+      + apply f_wd; auto.
       + apply IHa1; auto.
   Qed.
   
@@ -989,7 +1015,7 @@ Section map2_sametype.
   Proof. induction l1,l2; intros; simpl in *; try easy. f_equiv; auto. agroup. Qed.
   
 
-  Context `{AG:AGroup A Aadd 0 Aopp Aeq}.
+  Context `{AG:AGroup A Aeq Aadd 0 Aopp}.
   Notation "- a" := (Aopp a) : A_scope.
   Notation Asub := (fun a b => a + (-b)).
   Infix "-" := Asub : A_scope.
@@ -1136,7 +1162,7 @@ Section ladd_opp_sub.
   (* Variable sub_0_r : forall a, sub a Azero = a. *)
   (* Variable sub_self : forall a, sub a a = Azero. *)
 
-  Context `{AG:AGroup A Aadd Azero Aopp Aeq}.
+  Context `{AG:AGroup A Aeq Aadd Azero Aopp}.
   Notation Asub := (fun a b => Aadd a (Aopp b)).
   Infix "==" := (Aeq) : A_scope.
   Infix "==" := (eqlistA Aeq).
@@ -1248,7 +1274,7 @@ Section lcmul.
   Lemma lcmul_zero_r : forall a n, (lcmul a (lzero Azero n) == lzero Azero n)%list.
   Proof. intros. rewrite map_repeat. unfold lzero. f_equiv. ring. Qed.
 
-  Context `{HField:Field A Aadd 0 Aopp Amul 1 Ainv Aeq}.
+  Context `{HField:Field A Aeq Aadd 0 Aopp Amul 1 Ainv}.
   Add Field field_inst : (make_field_theory HField).
   Context {AeqDec : Dec Aeq}.
 
@@ -1295,7 +1321,7 @@ Section ldot.
     fold_right Aadd Azero (map2 Amul l1 l2).
 
   (** map is respect to aeq *)
-  #[export] Instance ldot_aeq : Proper (eqlistA Aeq ==> eqlistA Aeq ==> Aeq) ldot.
+  #[export] Instance ldot_wd : Proper (eqlistA Aeq ==> eqlistA Aeq ==> Aeq) ldot.
   Proof. simp_proper. intros. unfold ldot. rewrite H,H0. easy. Qed.
   
   (** l1 . l2 == l2 . l1 *)
@@ -2346,7 +2372,7 @@ Section dltrans.
     | l :: tl => consc l (dltrans tl c)
     end.
 
-  #[export] Instance dltrans_aeq :
+  #[export] Instance dltrans_wd :
     Proper (eqlistA (eqlistA Aeq) ==> eq ==> eqlistA (eqlistA Aeq)) dltrans.
   Proof.
     simp_proper. induction x; intros.
@@ -2563,7 +2589,7 @@ Section dmap.
   Context `{Aequiv : Equivalence A Aeq}.
   Context `{Bequiv : Equivalence B Beq}.
   Variable f : A -> B.
-  Context {fProper : (Proper (Aeq ==> Beq) f)}.
+  Context {f_wd : Proper (Aeq ==> Beq) f}.
   Infix "==" := Beq : A_scope.
   Infix "==" := (eqlistA Beq) : list_scope.
   Infix "==" := (eqlistA (eqlistA Beq)).
@@ -2921,7 +2947,7 @@ Section ldotdl_dldotdl.
     | [] => []
     end.
 
-  #[export] Instance ldotdl_aeq :
+  #[export] Instance ldotdl_wd :
     Proper (eqlistA Aeq ==> eqlistA (eqlistA Aeq) ==> eqlistA Aeq) ldotdl.
   Proof.
     simp_proper.
@@ -3092,7 +3118,7 @@ Section ldotdl_dldotdl.
     | [] => []
     end.
 
-  #[export] Instance dldotdl_aeq :
+  #[export] Instance dldotdl_wd :
     let deq := eqlistA (eqlistA Aeq) in
     Proper (deq ==> deq ==> deq) dldotdl.
   Proof.

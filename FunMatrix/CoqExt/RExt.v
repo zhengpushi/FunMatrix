@@ -99,35 +99,35 @@ Hint Resolve
 
 (** Associative *)
 
-#[export] Instance Radd_Assoc : Associative Rplus eq.
+#[export] Instance Radd_Assoc : Associative eq Rplus.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Rmul_Assoc : Associative Rmult eq.
+#[export] Instance Rmul_Assoc : Associative eq Rmult.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve Radd_Assoc Rmul_Assoc : R.
 
 (** Commutative *)
 
-#[export] Instance Radd_Comm : Commutative Rplus eq.
+#[export] Instance Radd_Comm : Commutative eq Rplus.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Rmul_Comm : Commutative Rmult eq.
+#[export] Instance Rmul_Comm : Commutative eq Rmult.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve Radd_Comm Rmul_Comm : R.
 
 (** Identity Left/Right *)
-#[export] Instance Radd_IdL : IdentityLeft Rplus 0 eq.
+#[export] Instance Radd_IdL : IdentityLeft eq Rplus 0.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Radd_IdR : IdentityRight Rplus 0 eq.
+#[export] Instance Radd_IdR : IdentityRight eq Rplus 0.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Rmul_IdL : IdentityLeft Rmult 1 eq.
+#[export] Instance Rmul_IdL : IdentityLeft eq Rmult 1.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Rmul_IdR : IdentityRight Rmult 1 eq.
+#[export] Instance Rmul_IdR : IdentityRight eq Rmult 1.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve
@@ -136,20 +136,20 @@ Hint Resolve
 
 (** Inverse Left/Right *)
 
-#[export] Instance Radd_InvL : InverseLeft Rplus 0 Ropp eq.
+#[export] Instance Radd_InvL : InverseLeft eq Rplus 0 Ropp.
 Proof. constructor; intros; ring. Qed.
 
-#[export] Instance Radd_InvR : InverseRight Rplus 0 Ropp eq.
+#[export] Instance Radd_InvR : InverseRight eq Rplus 0 Ropp.
 Proof. constructor; intros; ring. Qed.
 
 Hint Resolve Radd_InvL Radd_InvR : R.
 
 (** Distributive *)
 
-#[export] Instance Rmul_add_DistrL : DistrLeft Rplus Rmult eq.
+#[export] Instance Rmul_add_DistrL : DistrLeft eq Rplus Rmult.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Rmul_add_DistrR : DistrRight Rplus Rmult eq.
+#[export] Instance Rmul_add_DistrR : DistrRight eq Rplus Rmult.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve
@@ -159,10 +159,10 @@ Hint Resolve
 
 (** Semigroup *)
 
-#[export] Instance Radd_SGroup : SGroup Rplus eq.
+#[export] Instance Radd_SGroup : SGroup eq Rplus.
 Proof. constructor; auto with R. Qed.
 
-#[export] Instance Rmul_SGroup : SGroup Rmult eq.
+#[export] Instance Rmul_SGroup : SGroup eq Rmult.
 Proof. constructor; auto with R. Qed.
 
 Hint Resolve
@@ -172,10 +172,10 @@ Hint Resolve
 
 (** Abelian semigroup *)
 
-#[export] Instance Radd_ASGroup : ASGroup Rplus eq.
+#[export] Instance Radd_ASGroup : ASGroup eq Rplus.
 Proof. constructor; auto with R. Qed.
 
-#[export] Instance Rmul_ASGroup : ASGroup Rmult eq.
+#[export] Instance Rmul_ASGroup : ASGroup eq Rmult.
 Proof. constructor; auto with R. Qed.
 
 Hint Resolve
@@ -185,10 +185,10 @@ Hint Resolve
 
 (** Monoid *)
   
-#[export] Instance Radd_Monoid : Monoid Rplus 0 eq.
+#[export] Instance Radd_Monoid : Monoid eq Rplus 0.
 Proof. constructor; auto with R. Qed.
 
-#[export] Instance Rmul_Monoid : Monoid Rmult 1 eq.
+#[export] Instance Rmul_Monoid : Monoid eq Rmult 1.
 Proof. constructor; auto with R. Qed.
 
 Hint Resolve
@@ -198,49 +198,48 @@ Hint Resolve
 
 (** Abelian monoid *)
   
-#[export] Instance Radd_AMonoid : AMonoid Rplus 0 eq.
+#[export] Instance Radd_AMonoid : AMonoid eq Rplus 0.
 Proof. constructor; auto with R. Qed.
   
-#[export] Instance Rmul_AMonoid : AMonoid Rmult 1 eq.
+#[export] Instance Rmul_AMonoid : AMonoid eq Rmult 1.
 Proof. constructor; auto with R. Qed.
 
 Hint Resolve Radd_AMonoid Rmul_AMonoid : R.
 
 (** Group *)
 
-#[export] Instance Radd_Group : Group Rplus 0 Ropp eq.
+#[export] Instance Radd_Group : Group eq Rplus 0 Ropp.
 Proof. constructor; auto with R. Qed.
 
 Hint Resolve Radd_Group : R.
 
 (** AGroup *)
 
-#[export] Instance Radd_AGroup : AGroup Rplus 0 Ropp eq.
+#[export] Instance Radd_AGroup : AGroup eq Rplus 0 Ropp.
 Proof. constructor; auto with R. Qed.
 
 Hint Resolve Radd_AGroup : R.
 
 (** Ring *)
 
-#[export] Instance R_Ring : Ring Rplus 0 Ropp Rmult 1 eq.
+#[export] Instance R_Ring : Ring eq Rplus 0 Ropp Rmult 1.
 Proof. constructor; auto with R. Qed.
 
 Hint Resolve R_Ring : R.
 
 (** ARing *)
 
-#[export] Instance R_ARing : ARing Rplus 0 Ropp Rmult 1 eq.
+#[export] Instance R_ARing : ARing eq Rplus 0 Ropp Rmult 1.
 Proof. constructor; auto with R. Qed.
 
 Hint Resolve R_ARing : R.
 
 (** Field *)
+Hint Resolve R1_neq_R0 : R.
+Hint Resolve Rmult_inv_l : R.
 
-#[export] Instance R_Field : Field Rplus 0 Ropp Rmult 1 Rinv eq.
-Proof.
-  constructor; auto with R.
-  intros. field; auto.
-Qed.
+#[export] Instance R_Field : Field eq Rplus 0 Ropp Rmult 1 Rinv.
+Proof. constructor; auto with R. Qed.
 
 Hint Resolve R_Field : R.
 
@@ -257,13 +256,13 @@ Qed.
 Hint Resolve R_Order : R.
 
 #[export] Instance R_OrderedARing :
-  OrderedARing Rplus 0 Ropp Rmult 1 eq Rlt Rle.
+  OrderedARing eq Rplus 0 Ropp Rmult 1 Rlt Rle.
 Proof. constructor; auto with R. intros; lra. Qed.
 
 Hint Resolve R_OrderedARing : R.
 
 #[export] Instance R_OrderedField :
-  OrderedField Rplus 0 Ropp Rmult 1 Rinv eq Rlt Rle.
+  OrderedField eq Rplus 0 Ropp Rmult 1 Rinv Rlt Rle.
 Proof. constructor; auto with R. Qed.
 
 Hint Resolve R_OrderedField : R.

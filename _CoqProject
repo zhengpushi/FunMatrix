@@ -17,6 +17,7 @@
 
 # ========== CoqExt ====================
 FunMatrix/CoqExt/Basic.v
+FunMatrix/CoqExt/FuncExt.v
 FunMatrix/CoqExt/BoolExt.v
 FunMatrix/CoqExt/StrExt.v
 FunMatrix/CoqExt/TupleExt.v
@@ -36,7 +37,7 @@ FunMatrix/CoqExt/LinearSpace.v
 FunMatrix/CoqExt/MyExtrOCamlR.v
 
 # ========== Matrix ====================
-FunMatrix/Matrix/Fin.v
+# FunMatrix/Matrix/Fin.v
 FunMatrix/Matrix/Sequence.v
 FunMatrix/Matrix/Vector.v
 FunMatrix/Matrix/Matrix.v

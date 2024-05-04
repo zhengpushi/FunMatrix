@@ -28,40 +28,48 @@
      (3) 14 Elementary Properties of Groups
          https://faculty.atu.edu/mfinan/4033/absalg14.pdf
      (4) https://math.okstate.edu/people/binegar/3613/3613-l21.pdf
+  6. About "auto" and "try easy".
+     (1) "try easy" is generally useful than "auto".
+     For exmaple, if a conclusion is "a == b", where "==" is a setoid equal,
+     then "auto" can't finish it, but "easy" will.
+     (2) "try easy" is not strictly powerful than "auto".
+     For example, if a conclusion need a "apply H" to finished, then "try easy" won't
+     finish it, but "auto" can handle it.
 
   contents  :
   1. hierarchy structure
      Equivalence                    equivalent relation
      Dec Acmp                       decidable relation
-     Injective phi Aeq              an operation is injective
-     Surjective phi Aeq             an operation is surjective
-     Bijective phi Aeq              an operation is bijective
-     Homomorphic fa fb phi Aeq      if `phi (fa a1 a2) == fb (phi a1) (phi a2)`
-     Homomorphism fa fb Aeq         ∃ phi, Homomorphic fa fb phi /\ Surjective phi
-     Homomorphism2 fa fb g gb Aeq   ∃ phi, Homomorphic fa fb phi /\ 
+     Injective Aeq Beq phi          an operation is injective
+     Surjective Aeq Beq phi         an operation is surjective
+     Bijective Aeq Beq phi          an operation is bijective
+     Homomorphic Aeq Beq fa fb phi  if `phi (fa a1 a2) == fb (phi a1) (phi a2)`
+     Homomorphism Aeq Beq fa fb     ∃ phi, Homomorphic fa fb phi /\ Surjective phi
+     Homomorphism2 Aeq Beq fa fb g gb 
+                                    ∃ phi, Homomorphic fa fb phi /\ 
                                     Homomorphic g gb phi /\ Surjective phi
-     Associative f Aeq              an operation is associative
-     Commutative f Aeq              an operation is commutative
-     IdentityLeft f e Aeq           ∀ a, f e a == a
-     IdentityRight f e Aeq          ∀ a, f a e == a
-     DistrLeft Aadd Amul Aeq        ∀ a b c, a * (b + c) == a * b + a * c
-     DistrRight Aadd Amul Aeq       ∀ a b c, (a + b) * c == a * c + b * c
-     SGroup Aadd Aeq                semigroup {+,==}. Aadd is associative
-     ASGroup Aadd Aeq               abelian semigroup {+,==}. Aadd is commutative
-     Monoid Aadd Azero Aeq          monoid {+,0,==}
-     AMonoid Aadd Azero Aeq         abelian monoid {+,0,==}
-     Group Aadd Azero Aopp Aeq      group {+,0,-a,==}
-     AGroup Aadd Azero Aopp Aeq     abelian group {+,0,-a,==}
-     SemiRing Aadd Azero Amul Aone Aeq     semiring {+,0,*,1,==}
-     Ring Aadd Azero Aopp Amul Aone Aeq    ring {+,0,-a,*,1}
-     ARing Aadd Azero Aopp Amul Aone Aeq   abelian ring {+,0,-a,*,1}
-     Field Aadd Azero Aopp Amul Aone Ainv  field {+,0,-a,*,1,/a}
+     Associative Aeq op             an operation is associative
+     Commutative Aeq op             an operation is commutative
+     IdentityLeft Aeq op e          ∀ a, f e a == a
+     IdentityRight Aeq op e         ∀ a, f a e == a
+     DistrLeft Aeq Aadd Amul        ∀ a b c, a * (b + c) == a * b + a * c
+     DistrRight Aeq Aadd Amul       ∀ a b c, (a + b) * c == a * c + b * c
+     SGroup Aeq Aadd                semigroup {+,==}. Aadd is associative
+     ASGroup Aeq Aadd               abelian semigroup {+,==}. Aadd is commutative
+     Monoid Aeq Aadd Azero          monoid {+,0,==}
+     AMonoid Aeq Aadd Azero         abelian monoid {+,0,==}
+     Group Aeq Aadd Azero Aopp      group {+,0,-a,==}
+     AGroup Aeq Aadd Azero Aopp     abelian group {+,0,-a,==}
+     SemiRing Aeq Aadd Azero Amul Aone     semiring {+,0,*,1,==}
+     Ring Aeq Aadd Azero Aopp Amul Aone    ring {+,0,-a,*,1}
+     ARing Aeq Aadd Azero Aopp Amul Aone   abelian ring {+,0,-a,*,1}
+     Field Aeq Aadd Azero Aopp Amul Aone Ainv  field {+,0,-a,*,1,/a}
      Order Aeq Alt Ale              order {==,<,<=}
-     OrderedARing Aadd Azero Aopp Amul Aone Aeq Alt Ale   
+     OrderedARing Aeq Aadd Azero Aopp Amul Aone Alt Ale   
                   abelian-ring {+,0,-a,*,1} + order
-     OrderedField Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale  
+     OrderedField Aeq Aadd Azero Aopp Amul Aone Ainv Alt Ale  
                   field {+,0,-a,*,1,/a} + order
-     A2R Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale (a2r:A->R)
+     A2R Aeq Aadd Azero Aopp Amul Aone Ainv Alt Ale (a2r:A->R)
                 operations {+,0,-x,*,1,/x,==,<,<=} is consistent with a2r
   
      ============= The structure of algebraic structure ===============
@@ -118,6 +126,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 
 Generalizable Variables A Aeq Aadd Azero Aopp Amul Aone Ainv Adiv Alt.
+Generalizable Variables B Beq.
 
 
 (* ######################################################################### *)
@@ -396,8 +405,7 @@ Axiom functional_extensionality_setoid :
     (forall a : A, Beq (f a) (g a)) -> feq f g.
 
 Section Theories.
-  Context {A B: Type} {Aeq:relation A} {Beq:relation B}.
-  Context {Equiv_Aeq:Equivalence Aeq} {Equiv_Beq:Equivalence Beq}.
+  Context `{AeqEquiv : Equivalence A Aeq} `{BeqEquiv:Equivalence B Beq}.
   Notation Bijective := (Bijective (Aeq:=Aeq) (Beq:=Beq)).
   Infix "=A=" := Aeq (at level 70).
   Infix "=B=" := Beq (at level 70).
@@ -585,7 +593,7 @@ Qed.
 (** * Associative *)
 
 (** ** Class *)
-Class Associative {A} (Aop : A -> A -> A) (Aeq : relation A) := {
+Class Associative {A} (Aeq : relation A) (Aop : A -> A -> A) := {
     associative : forall a b c, Aeq (Aop (Aop a b) c) (Aop a (Aop b c));
   }.
 
@@ -600,7 +608,7 @@ Class Associative {A} (Aop : A -> A -> A) (Aeq : relation A) := {
 (** * Commutative *)
 
 (** ** Class *)
-Class Commutative {A} (Aop : A -> A -> A) (Aeq : relation A) := {
+Class Commutative {A} (Aeq : relation A) (Aop : A -> A -> A) := {
     commutative : forall a b, Aeq (Aop a b) (Aop b a)
   }.
 
@@ -615,11 +623,11 @@ Class Commutative {A} (Aop : A -> A -> A) (Aeq : relation A) := {
 (** * Identity Left/Right *)
 
 (** ** Class *)
-Class IdentityLeft {A} (Aop : A -> A -> A) (Ae : A) (Aeq : relation A) := {
+Class IdentityLeft {A} (Aeq : relation A) (Aop : A -> A -> A) (Ae : A) := {
     identityLeft : forall a, Aeq (Aop Ae a) a
   }.
 
-Class IdentityRight {A} (Aop : A -> A -> A) (Ae : A) (Aeq : relation A)  := {
+Class IdentityRight {A} (Aeq : relation A) (Aop : A -> A -> A) (Ae : A) := {
     identityRight : forall a, Aeq (Aop a Ae) a
   }.
 
@@ -634,13 +642,13 @@ Class IdentityRight {A} (Aop : A -> A -> A) (Ae : A) (Aeq : relation A)  := {
 (** * Inverse Left/Right *)
 
 (** ** Class *)
-Class InverseLeft {A} (Aop : A -> A -> A) (Ae : A) (Ainv : A -> A)
-  (Aeq : relation A) := {
+Class InverseLeft {A} (Aeq : relation A) (Aop : A -> A -> A) (Ae : A) (Ainv : A -> A)
+  := {
     inverseLeft : forall a, Aeq (Aop (Ainv a) a) Ae
   }.
 
-Class InverseRight {A} (Aop : A -> A -> A) (Ae : A) (Ainv : A -> A)
-  (Aeq : relation A) := {
+Class InverseRight {A} (Aeq : relation A) (Aop : A -> A -> A) (Ae : A) (Ainv : A -> A)
+  := {
     inverseRight : forall a, Aeq (Aop a (Ainv a)) Ae
   }.
 
@@ -661,12 +669,12 @@ Class InverseRight {A} (Aop : A -> A -> A) (Ae : A) (Ainv : A -> A)
 (*       Aopp (Tadd a b) = Tadd (Aopp a) (Aopp b) *)
 (*   }. *)
 
-Class DistrLeft {A} (Aadd Amul : A -> A -> A) (Aeq : relation A) := {
+Class DistrLeft {A} (Aeq : relation A) (Aadd Amul : A -> A -> A) := {
     distrLeft : forall a b c,
       Aeq (Amul a (Aadd b c)) (Aadd (Amul a b) (Amul a c))
   }.
 
-Class DistrRight {A} (Aadd Amul : A -> A -> A) (Aeq : relation A) := {
+Class DistrRight {A} (Aeq : relation A) (Aadd Amul : A -> A -> A) := {
     distrRight : forall a b c,
       Aeq (Amul (Aadd a b) c) (Aadd (Amul a c) (Amul b c))
   }.
@@ -698,20 +706,20 @@ Class DistrRight {A} (Aadd Amul : A -> A -> A) (Aeq : relation A) := {
 (** * Semigroup *)
 
 (** ** Class *)
-Class SGroup {A} Aadd Aeq := {
+Class SGroup {A} Aeq Aadd := {
     sgroupEquiv :: Equivalence Aeq;
-    sgroupAssoc :: @Associative A Aadd Aeq;
-    sgroupAaddProper :: Proper (Aeq ==> Aeq ==> Aeq) Aadd;
+    sgroupAssoc :: @Associative A Aeq Aadd;
+    sgroupAadd_wd :: Proper (Aeq ==> Aeq ==> Aeq) Aadd;
   }.
 (* Coercion sgroupEquiv : SGroup >-> Equivalence. *)
 (* Coercion sgroupAssoc : SGroup >-> Associative. *)
-(* Coercion sgroupAaddProper : SGroup >-> Proper. *)
+(* Coercion sgroupAadd_wd : SGroup >-> Proper. *)
 
 
 (** ** Theories *)
 
 (* Eliminate head term in an expression over semi-group <op, aeq> *)
-Ltac sgroup_head op aeq :=
+Ltac sgroup_head aeq op :=
   rewrite ?associative;
   repeat
     (try
@@ -719,31 +727,31 @@ Ltac sgroup_head op aeq :=
        (* Tips: if there are Proper relation in the context, then 
         f_equiv = f_equal + reflexivity *)
        (* | |- aeq (op ?a _) (op ?a _) => 
-          apply sgroupAaddProper; [reflexivity|] *)
+          apply sgroupAadd_wd; [reflexivity|] *)
        | |- aeq (op ?a _) (op ?a _) => f_equiv
        end;
-     try easy).
+     auto; try easy).
 
 (* Eliminate tail term in an expression over semi-group <op, aeq> *)
-Ltac sgroup_tail op aeq :=
+Ltac sgroup_tail aeq op :=
   rewrite <- ?associative;
   repeat
     (try
        match goal with
        | |- aeq (op _ ?a) (op _ ?a) => f_equiv
        end;
-     try easy).
+     auto; try easy).
 
 (** Simplify equality on semigroup <SG, op, aeq> *)
-Ltac sgroup_core op aeq :=
+Ltac sgroup_core aeq op :=
   intros;
-  try (progress (sgroup_head op aeq));
-  try (progress (sgroup_tail op aeq)).
+  try (progress (sgroup_head aeq op));
+  try (progress (sgroup_tail aeq op)).
 
 (** Simplify equality on semigroup in current context *)
 Ltac sgroup :=
   match goal with
-  | SG : SGroup ?op ?aeq |- _ => sgroup_core op aeq
+  | SG : SGroup ?aeq ?op |- _ => sgroup_core aeq op
   end.
 
 (** ** Instances *)
@@ -790,9 +798,9 @@ End test.
 (** * Abelian semigroup *)
 
 (** ** Class *)
-Class ASGroup {A} Aadd Aeq := {
-    asgroupSGroup :: @SGroup A Aadd Aeq;
-    asgroupComm :: Commutative Aadd Aeq
+Class ASGroup {A} Aeq Aadd := {
+    asgroupSGroup :: @SGroup A Aeq Aadd;
+    asgroupComm :: Commutative Aeq Aadd
   }.
 Coercion asgroupSGroup : ASGroup >-> SGroup.
 (* Coercion asgroupComm : ASGroup >-> Commutative. *)
@@ -978,31 +986,32 @@ Section try2.
     rewrite <- ?associative;
     (* 找出所有可能的匹配 *)
     repeat
-      (match goal with
-       (* 1 level *)
-       | |- ?aeq (?f ?a _) (?f ?a _) => f_equiv
-       | |- ?aeq (?f _ ?a) (?f _ ?a) => f_equiv
-       | |- ?aeq (?f ?a _) (?f _ ?a) => do 2 move2t a
-       | |- ?aeq (?f _ ?a) (?f ?a _) => do 2 move2t a
-       (* 2 levels *)
-       | |- ?aeq (?f (?f ?a _) _) (?f ?a _) => do 2 move2t a
-       | |- ?aeq (?f (?f ?a _) _) (?f _ ?a) => do 2 move2t a
-       | |- ?aeq (?f (?f _ ?a) _) (?f ?a _) => do 2 move2t a
-       | |- ?aeq (?f (?f _ ?a) _) (?f _ ?a) => do 2 move2t a
-       | |- ?aeq (?f ?a _) (?f (?f ?a _)) _ => do 2 move2t a
-       | |- ?aeq (?f ?a _) (?f (?f _ ?a)) _ => do 2 move2t a
-       | |- ?aeq (?f _ ?a) (?f (?f ?a _)) _ => do 2 move2t a
-       | |- ?aeq (?f _ ?a) (?f (?f _ ?a)) _ => do 2 move2t a
-       | |- ?aeq (?f (?f ?a _) _) (?f (?f ?a _) _) => do 2 move2t a
-       | |- ?aeq (?f (?f ?a _) _) (?f (?f _ ?a) _) => do 2 move2t a
-       | |- ?aeq (?f (?f _ ?a) _) (?f (?f ?a _) _) => do 2 move2t a
-       | |- ?aeq (?f (?f _ ?a) _) (?f (?f _ ?a) _) => do 2 move2t a
-       | |- ?aeq (?f (?f ?a _) _) (?f _ (?f ?a _)) => do 2 move2t a
-       | |- ?aeq (?f (?f ?a _) _) (?f _ (?f _ ?a)) => do 2 move2t a
-       | |- ?aeq (?f (?f _ ?a) _) (?f _ (?f ?a _)) => do 2 move2t a
-       | |- ?aeq (?f (?f _ ?a) _) (?f _ (?f _ ?a)) => do 2 move2t a
-       end;
-       auto).
+      (try
+         match goal with
+         (* 1 level *)
+         | |- ?aeq (?f ?a _) (?f ?a _) => f_equiv
+         | |- ?aeq (?f _ ?a) (?f _ ?a) => f_equiv
+         | |- ?aeq (?f ?a _) (?f _ ?a) => do 2 move2t a
+         | |- ?aeq (?f _ ?a) (?f ?a _) => do 2 move2t a
+         (* 2 levels *)
+         | |- ?aeq (?f (?f ?a _) _) (?f ?a _) => do 2 move2t a
+         | |- ?aeq (?f (?f ?a _) _) (?f _ ?a) => do 2 move2t a
+         | |- ?aeq (?f (?f _ ?a) _) (?f ?a _) => do 2 move2t a
+         | |- ?aeq (?f (?f _ ?a) _) (?f _ ?a) => do 2 move2t a
+         | |- ?aeq (?f ?a _) (?f (?f ?a _)) _ => do 2 move2t a
+         | |- ?aeq (?f ?a _) (?f (?f _ ?a)) _ => do 2 move2t a
+         | |- ?aeq (?f _ ?a) (?f (?f ?a _)) _ => do 2 move2t a
+         | |- ?aeq (?f _ ?a) (?f (?f _ ?a)) _ => do 2 move2t a
+         | |- ?aeq (?f (?f ?a _) _) (?f (?f ?a _) _) => do 2 move2t a
+         | |- ?aeq (?f (?f ?a _) _) (?f (?f _ ?a) _) => do 2 move2t a
+         | |- ?aeq (?f (?f _ ?a) _) (?f (?f ?a _) _) => do 2 move2t a
+         | |- ?aeq (?f (?f _ ?a) _) (?f (?f _ ?a) _) => do 2 move2t a
+         | |- ?aeq (?f (?f ?a _) _) (?f _ (?f ?a _)) => do 2 move2t a
+         | |- ?aeq (?f (?f ?a _) _) (?f _ (?f _ ?a)) => do 2 move2t a
+         | |- ?aeq (?f (?f _ ?a) _) (?f _ (?f ?a _)) => do 2 move2t a
+         | |- ?aeq (?f (?f _ ?a) _) (?f _ (?f _ ?a)) => do 2 move2t a
+         end;
+       auto; try easy).
 
   Section test.
     Context `{HASGroup : ASGroup}. Infix "+" := Aadd. Infix "==" := Aeq.
@@ -1034,7 +1043,7 @@ Ltac asgroup_smaller :=
   
 (** Eliminate all possible common sub terms on Abelian semigroup <ASG, op, aeq>
     消去交换半群<ASG, op, aeq>上的所有可能相同的项 *)
-Ltac asgroup_core op aeq :=
+Ltac asgroup_core aeq op :=
   intros;
   (* 此时使用左结合，然后每个相同的项移动至尾部来消去。（也可以右结合+头部) *)
   rewrite <- ?associative;
@@ -1053,13 +1062,13 @@ Ltac asgroup_core op aeq :=
              end
          end
      end;
-     try easy);
+     auto; try easy);
   try asgroup_smaller.
 
 (** Eliminate all possible common sub terms on Abelian semigroup in current context
     消去上下文中交换半群上的所有可能相同的项 *)
 Ltac asgroup :=
-  try match goal with ASG:ASGroup ?op ?aeq |- _ => asgroup_core op aeq end;
+  try match goal with ASG:ASGroup ?aeq ?op |- _ => asgroup_core aeq op end;
   try asgroup_smaller.
 
 (** ** Instances *)
@@ -1123,80 +1132,65 @@ End test.
 (** * Monoid 幺半群、独异点 *)
 
 (** ** Class *)
-Class Monoid {A} Aadd Azero Aeq := {
-    monoidSGroup :: @SGroup A Aadd Aeq;
-    monoidIdL :: IdentityLeft Aadd Azero Aeq;
-    monoidIdR :: IdentityRight Aadd Azero Aeq
+Class Monoid {A} Aeq Aadd Azero := {
+    monoidSGroup :: @SGroup A Aeq Aadd;
+    monoidIdL :: IdentityLeft Aeq Aadd Azero;
+    monoidIdR :: IdentityRight Aeq Aadd Azero
   }.
 Coercion monoidSGroup : Monoid >-> SGroup.
 (* Coercion monoidIdL : Monoid >-> IdentityLeft. *)
 (* Coercion monoidIdR : Monoid >-> IdentityRight. *)
 
-Arguments monoidSGroup {A Aadd Azero Aeq}.
-Arguments monoidIdL {A Aadd Azero Aeq}.
-Arguments monoidIdR {A Aadd Azero Aeq}.
-
+Arguments monoidSGroup {A Aeq Aadd Azero}.
+Arguments monoidIdL {A Aeq Aadd Azero}.
+Arguments monoidIdR {A Aeq Aadd Azero}.
 
 (** ** Theories *)
 
 (* handle structures smaller than this *)
 Ltac monoid_smaller :=
   match goal with
-  | SG:SGroup ?op ?aeq |- _ => sgroup_core op aeq
+  | SG:SGroup ?aeq ?op |- _ => sgroup_core aeq op
   end.
 
-(* Simplify expressions on monoid <M, op, e, aeq>, only new features of monoid *)
-Ltac monoid_only op e aeq :=
+(* Simplify expressions on monoid <M, aeq, op, e>, only new features of monoid *)
+Ltac monoid_only aeq op e :=
   intros;
   repeat
     (try
        match goal with
        (* 0 + a = a *)
-       | [M:Monoid op e aeq |- context [op e ?a]] =>
-           rewrite (@identityLeft _ op e aeq (monoidIdL M) a) at 1
-       | [M:Monoid op e aeq, H:context [op e ?a] |- _] =>
-           rewrite (@identityLeft _ op e aeq (monoidIdL M) a) in H at 1
+       | [M:Monoid aeq op e |- context [op e ?a]] =>
+           rewrite (@identityLeft _ aeq op e (monoidIdL M) a) at 1
+       | [M:Monoid aeq op e, H:context [op e ?a] |- _] =>
+           rewrite (@identityLeft _ aeq op e (monoidIdL M) a) in H at 1
        (* a + 0 = a *)
-       | [M:Monoid op e aeq |- context [op ?a e]] =>
-           rewrite (@identityRight _ op e aeq (monoidIdR M) a) at 1
-       | [M:Monoid op e aeq, H:context [op ?a e] |- _] =>
-           rewrite (@identityRight _ op e aeq (monoidIdR M) a) in H at 1
+       | [M:Monoid aeq op e |- context [op ?a e]] =>
+           rewrite (@identityRight _ aeq op e (monoidIdR M) a) at 1
+       | [M:Monoid aeq op e, H:context [op ?a e] |- _] =>
+           rewrite (@identityRight _ aeq op e (monoidIdR M) a) in H at 1
        end;
-     try easy).
+     auto; try easy).
 
 (* Simplify expressions on monoid <M, op, e, aeq> *)
-Ltac monoid_core op e aeq :=
+Ltac monoid_core aeq op e :=
   repeat
     (match goal with
      (* M + SG，则顺序执行二者 *)
-     | M:Monoid op e aeq, SG:SGroup op aeq |- _ =>
-         monoid_only op e aeq; sgroup_core op aeq
+     | M:Monoid aeq op e, SG:SGroup aeq op |- _ =>
+         monoid_only aeq op e; sgroup_core aeq op
      (* M，则转换为 M + SG *)
-     | M:Monoid op e aeq |- _ => pose proof (monoidSGroup M) as HSGroup
+     | M:Monoid aeq op e |- _ => pose proof (monoidSGroup M) as HSGroup
      end;
-     try easy);
+     auto; try easy);
   try monoid_smaller.
 
 (* Simplify expressions on monoid in current context *)
 Ltac monoid :=
-  try match goal with M:Monoid ?op ?e ?aeq |- _ => monoid_core op e aeq end;
+  try match goal with M:Monoid ?aeq ?op ?e |- _ => monoid_core aeq op e end;
   try monoid_smaller.
 
-
 (** ** Instances *)
-Section list.
-  Import SetoidList.
-  Context `{HMonoid : Monoid}.
-  
-  (** fold_left is a proper relation *)
-  #[export] Instance fold_left_aeq :
-    Proper (eqlistA Aeq ==> Aeq ==> Aeq) (fold_left Aadd).
-  Proof.
-    intros l1. induction l1; intros l2 Hl a1 a2 Ha.
-    - inv Hl. simpl. auto.
-    - destruct l2. easy. inv Hl. simpl. apply IHl1; auto. rewrite Ha,H2. easy.
-  Qed.
-End list.
 
 (** ** Examples *)
 
@@ -1215,48 +1209,48 @@ End Examples.
 (** * Abelian monoid *)
 
 (** ** Class *)
-Class AMonoid {A} Aadd Azero Aeq := {
-    amonoidMonoid :: @Monoid A Aadd Azero Aeq;
-    amonoidComm :: Commutative Aadd Aeq;
-    amonoidASGroup :: ASGroup Aadd Aeq
+Class AMonoid {A} Aeq Aadd Azero := {
+    amonoidMonoid :: @Monoid A Aeq Aadd Azero;
+    amonoidComm :: Commutative Aeq Aadd;
+    amonoidASGroup :: ASGroup Aeq Aadd
   }.
 
 Coercion amonoidMonoid : AMonoid >-> Monoid.
 (* Coercion amonoidComm : AMonoid >-> Commutative. *)
 Coercion amonoidASGroup : AMonoid >-> ASGroup.
 
-Arguments amonoidMonoid {A Aadd Azero Aeq}.
-Arguments amonoidASGroup {A Aadd Azero Aeq}.
+Arguments amonoidMonoid {A Aeq Aadd Azero}.
+Arguments amonoidASGroup {A Aeq Aadd Azero}.
 
 (** ** Theories *)
 
 (* handle structures smaller than this *)
 Ltac amonoid_smaller :=
   match goal with
-  | M:Monoid ?op ?e ?aeq |- _ => monoid_core op e aeq
-  | ASG:ASGroup ?op ?aeq |- _ => asgroup_core op aeq
-  | SG:ASGroup ?op ?aeq |- _ => sgroup_core op aeq
+  | M:Monoid ?aeq ?op ?e |- _ => monoid_core aeq op e
+  | ASG:ASGroup ?aeq ?op |- _ => asgroup_core aeq op
+  | SG:ASGroup ?aeq ?op |- _ => sgroup_core aeq op
   end.
 
 (* Simplify expressions on Abelian monoid <AM, op, e, aeq> *)
-Ltac amonoid_core op e aeq :=
+Ltac amonoid_core aeq op e :=
   repeat
     (try
        match goal with
        (* M + ASG，则顺序执行二者 *)
-       | M:Monoid op e aeq, ASG:ASGroup op aeq |- _ =>
-           monoid_core op e aeq; asgroup_core op aeq
+       | M:Monoid aeq op e, ASG:ASGroup aeq op |- _ =>
+           monoid_core aeq op e; asgroup_core aeq op
        (* AM，则先转换为 M + ASG *)
-       | AM:AMonoid op e aeq |- _ =>
+       | AM:AMonoid aeq op e |- _ =>
            try pose proof (amonoidMonoid AM) as HMonoid;
            try pose proof (amonoidASGroup AM) as HASGroup
        end;
-     try easy);
+     auto; try easy);
   try amonoid_smaller.
 
 (* Simplify expressions on Abelian monoid in current context *)
 Ltac amonoid :=
-  try match goal with AM:AMonoid ?op ?e ?aeq |- _ => amonoid_core op e aeq end;
+  try match goal with AM:AMonoid ?aeq ?op ?e |- _ => amonoid_core aeq op e end;
   try amonoid_smaller.
 
 (** ** Instances *)
@@ -1277,96 +1271,96 @@ End Examples.
 (** * Group *)
 
 (** ** Class *)
-Class Group {A} Aadd Azero Aopp Aeq := {
-    groupAoppProper :: Proper (Aeq ==> Aeq) Aopp;
-    groupMonoid :: @Monoid A Aadd Azero Aeq;
-    groupInvL :: InverseLeft Aadd Azero Aopp Aeq;
-    groupInvR :: InverseRight Aadd Azero Aopp Aeq;
+Class Group {A} Aeq Aadd Azero Aopp := {
+    groupAopp_wd :: Proper (Aeq ==> Aeq) Aopp;
+    groupMonoid :: @Monoid A Aeq Aadd Azero;
+    groupInvL :: InverseLeft Aeq Aadd Azero Aopp;
+    groupInvR :: InverseRight Aeq Aadd Azero Aopp;
   }.
-(* Coercion groupAoppProper : Group >-> Proper. *)
+(* Coercion groupAopp_wd : Group >-> Proper. *)
 Coercion groupMonoid : Group >-> Monoid.
 (* Coercion groupInvL : Group >-> InverseLeft. *)
 (* Coercion groupInvR : Group >-> InverseRight. *)
 
-Arguments groupMonoid {A Aadd Azero Aopp Aeq}.
+Arguments groupMonoid {A Aeq Aadd Azero Aopp}.
 
 (** ** Theories *)
 
-(* Basic simplify on group <G, op, e, inv, aeq>, only for new features of group *)
-Ltac group_basic_only op e inv aeq :=
+(* Basic simplify on group <G, aeq, op, e, inv>, only for new features of group *)
+Ltac group_basic_only aeq op e inv :=
   intros;
   repeat
     (try
        match goal with
        (* - a + a *)
-       | [G:Group op e inv aeq, H:context[op (inv ?a) ?a] |-_] =>
+       | [G:Group aeq op e inv, H:context[op (inv ?a) ?a] |-_] =>
            rewrite (inverseLeft a) in H at 1
-       | [G:Group op e inv aeq |- context [op (inv ?a) ?a]] =>
+       | [G:Group aeq op e inv |- context [op (inv ?a) ?a]] =>
            rewrite (inverseLeft a) at 1
        (* a + - a *)
-       | [G:Group op e inv aeq, H:context[op ?a (inv ?a)] |-_] =>
+       | [G:Group aeq op e inv, H:context[op ?a (inv ?a)] |-_] =>
            rewrite (inverseRight a) in H at 1
-       | [G:Group op e inv aeq |- context [op ?a (inv ?a)]] =>
+       | [G:Group aeq op e inv |- context [op ?a (inv ?a)]] =>
            rewrite (inverseRight a) at 1
        (* -a + (a + b) *)
-       | [G:Group op e inv aeq, H:context[op (inv ?a) (op ?a ?b)] |- _] =>
+       | [G:Group aeq op e inv, H:context[op (inv ?a) (op ?a ?b)] |- _] =>
            rewrite <- (associative (inv a) a) in H;
            rewrite (inverseLeft a) in H at 1
-       | [G:Group op e inv aeq |- context[op (inv ?a) (op ?a ?b)] ] =>
+       | [G:Group aeq op e inv |- context[op (inv ?a) (op ?a ?b)] ] =>
            rewrite <- (associative (inv a) a);
            rewrite (inverseLeft a) at 1
        (* a + (-a + b) *)
-       | [G:Group op e inv aeq, H:context[op ?a (op (inv ?a) ?b)] |- _] =>
+       | [G:Group aeq op e inv, H:context[op ?a (op (inv ?a) ?b)] |- _] =>
            rewrite <- (associative a (inv a)) in H;
            rewrite (inverseRight a) in H at 1
-       | [G:Group op e inv aeq |- context[op ?a (op (inv ?a) ?b)] ] =>
+       | [G:Group aeq op e inv |- context[op ?a (op (inv ?a) ?b)] ] =>
            rewrite <- (associative a (inv a));
            rewrite (inverseRight a) at 1
        (* (a + b) + -b *)
-       | [G:Group op e inv aeq, H:context[op (op ?a ?b) (inv ?b)] |- _] =>
+       | [G:Group aeq op e inv, H:context[op (op ?a ?b) (inv ?b)] |- _] =>
            rewrite (associative a b) in H;
            rewrite (inverseRight b) in H at 1
-       | [G:Group op e inv aeq |- context[op (op ?a ?b) (inv ?b)] ] =>
+       | [G:Group aeq op e inv |- context[op (op ?a ?b) (inv ?b)] ] =>
            rewrite (associative a b);
            rewrite (inverseRight b) at 1
        (* (a + -b) + b *)
-       | [G:Group op e inv aeq, H:context[op (op ?a (inv ?b)) ?b] |- _] =>
+       | [G:Group aeq op e inv, H:context[op (op ?a (inv ?b)) ?b] |- _] =>
            rewrite (associative a (inv b)) in H;
            rewrite (inverseLeft b) in H at 1
-       | [G:Group op e inv aeq |- context[op (op ?a (inv ?b)) ?b] ] =>
+       | [G:Group aeq op e inv |- context[op (op ?a (inv ?b)) ?b] ] =>
            rewrite (associative a (inv b));
            rewrite (inverseLeft b) at 1
        end;
-     try easy).
+     auto; try easy).
 
 (* handle structures smaller than this *)
 Ltac group_smaller :=
   match goal with
-  | AM : AMonoid ?op ?e ?aeq |- _ => amonoid_core op e aeq
-  | M:Monoid ?op ?e ?aeq |- _ => monoid_core op e aeq
-  | ASG:ASGroup ?op ?aeq |- _ => asgroup_core op aeq
-  | SG:ASGroup ?op ?aeq |- _ => sgroup_core op aeq
+  | AM : AMonoid ?aeq ?op ?e |- _ => amonoid_core aeq op e
+  | M:Monoid ?aeq ?op ?e |- _ => monoid_core aeq op e
+  | ASG:ASGroup ?aeq ?op |- _ => asgroup_core aeq op
+  | SG:ASGroup ?aeq ?op |- _ => sgroup_core aeq op
   end.
 
-(* Basic simplify on group <G, op, e, inv, aeq> *)
-Ltac group_basic_core op e inv aeq :=
+(* Basic simplify on group <G, aeq, op, e, inv> *)
+Ltac group_basic_core aeq op e inv :=
   repeat
     (try
        match goal with
        (* G + M，则顺序执行二者 *)
-       | G:Group ?op ?e ?inv ?aeq, M:Monoid ?op ?e ?aeq |- _ =>
-           group_basic_only op e inv aeq;
-           monoid_core op e aeq
+       | G:Group ?aeq ?op ?e ?inv, M:Monoid ?aeq ?op ?e |- _ =>
+           group_basic_only aeq op e inv;
+           monoid_core aeq op e
        (* G，则转换为 G + M *)
-       | G:Group ?op ?e ?inv ?aeq |- _ => try pose proof (groupMonoid G) as HMonoid
+       | G:Group ?aeq ?op ?e ?inv |- _ => try pose proof (groupMonoid G) as HMonoid
        end;
-     try easy);
+     auto; try easy);
   try group_smaller.
 
 (* Basic simplify on group in current context *)
 Ltac group_basic :=
   try match goal with
-      G:Group ?op ?e ?inv ?aeq |- _ => group_basic_core op e inv aeq
+    | G:Group ?aeq ?op ?e ?inv |- _ => group_basic_core aeq op e inv
     end;
   try group_smaller.
 
@@ -1530,46 +1524,6 @@ Section GroupTheory.
     - rewrite H. group_basic.
   Qed.
 
-  (* This theorem will be moved to ListExt, because this dependends list theory *)
-  (** Theorem 14.3 (Generalized Associative Law) *)
-  (* Section th14_3. *)
-  (*   Notation "'\sum' a '&' l " := (fold_left Aadd l a) (at level 10). *)
-    
-  (*   Theorem group_assoc_general : forall (l1 l2 : list A), *)
-  (*     \sum 0 & l1 + \sum 0 & l2 == \sum 0 & (l1 ++ l2). *)
-  (*   Proof. *)
-  (*     induction l1, l2; simpl; group_basic. *)
-  (*     - rewrite app_nil_r. easy. *)
-  (*     - Search fold_left. *)
-  (*       ? rebase *)
-
-          
-  (*     -  *)
-  (*       (* H1. forall a l1 l2, Σ a & (l1 ++ l2) == Σ (Σ a & l1) & l2 *)
-  (*          H2. forall a b l, a + Σ b & l == Σ (a + b) & l *)
-  (*          H3. forall a b l, Σ a & (b :: l) == Σ (a + b) & l *)
-  (*          by H1, right == Σ (Σ a1 & l1) & (a2 :: l2). *)
-  (*          by H2, left  == Σ ((Σ a1 & l1) + a2) & l2). *)
-  (*          remember (Σ a1 & l1) as c, then goal become to *)
-  (*             Σ (c + a2) & l2 == Σ c & (a2 :: l2) *)
-  (*          by H3, we got it. *) *)
-  (*       assert (forall a l1 l2, Σ a & (l1 ++ l2) == Σ (Σ a & l1) & l2) as H1. *)
-  (*       { intros a l0. revert a. induction l0; intros; try easy. *)
-  (*         simpl. rewrite IHl0. easy. } *)
-  (*       assert (forall a b l, a + Σ b & l == Σ (a + b) & l) as H2. *)
-  (*       { intros. revert a b. induction l; simpl; intros; try easy. *)
-  (*         simpl. rewrite IHl. *)
-  (*         (** fold_left preveres the aeq *) *)
-  (*         assert (forall l a1 a2, a1 == a2 -> Σ a1 & l == Σ a2 & l). *)
-  (*         { induction l0; intros; simpl in *; auto. *)
-  (*           apply IHl0. rewrite H. easy. } *)
-  (*         apply H. group_basic. } *)
-  (*       assert (forall a b l, Σ a & (b :: l) == Σ (a + b) & l) as H3. *)
-  (*       { intros. revert a b. induction l; try easy. } *)
-  (*       rewrite H1. rewrite H2. rewrite H3. easy. *)
-  (*   Qed. *)
-  (* End th14_3. *)
-
   Section th14_4.
 
     Import ZArith.
@@ -1653,68 +1607,68 @@ Section GroupTheory.
 
 End GroupTheory.
 
-(* Simplfy expressions on group <G, op, e, inv, aeq>, using advanced properties *)
-Ltac group_advanced_only op e inv aeq :=
+(* Simplfy expressions on group <G, aeq, op, e, inv>, using advanced properties *)
+Ltac group_advanced_only aeq op e inv :=
   intros;
   repeat
     (try
        match goal with
        (* ------------ simplify in both context and goal ------------ *)
        (* - 0 *)
-       | [G:Group op e inv aeq, H:context [inv e] |- _] =>
+       | [G:Group aeq op e inv, H:context [inv e] |- _] =>
            rewrite group_opp_0 in H at 1
-       | [G:Group op e inv aeq |- context [inv e]] =>
+       | [G:Group aeq op e inv |- context [inv e]] =>
            rewrite group_opp_0 at 1
        (* - - a *)
-       | [G:Group op e inv aeq, H:context [inv (inv ?a)] |- _] =>
+       | [G:Group aeq op e inv, H:context [inv (inv ?a)] |- _] =>
            rewrite (group_opp_opp a) in H
-       | [G:Group op e inv aeq |- context [inv (inv ?a)]] =>
+       | [G:Group aeq op e inv |- context [inv (inv ?a)]] =>
            rewrite (group_opp_opp a)
        (* - (a + b) *)
-       | [G:Group op e inv aeq, H:context [inv (op ?a ?b)] |- _] =>
+       | [G:Group aeq op e inv, H:context [inv (op ?a ?b)] |- _] =>
            rewrite (group_opp_distr a b) in H at 1
-       | [G:Group op e inv aeq |- context [inv (op ?a ?b)]] =>
+       | [G:Group aeq op e inv |- context [inv (op ?a ?b)]] =>
            rewrite (group_opp_distr a b) at 1
        (* - a == - b  *)
-       | [G:Group op e inv aeq, H:context [aeq (inv ?a) (inv ?b)] |- _] =>
+       | [G:Group aeq op e inv, H:context [aeq (inv ?a) (inv ?b)] |- _] =>
            apply group_opp_inj in H
-       | [G:Group op e inv aeq |- context [aeq (inv ?a) (inv ?b)]] =>
+       | [G:Group aeq op e inv |- context [aeq (inv ?a) (inv ?b)]] =>
            apply group_opp_inj
        (* - a == 0 *)
-       | [G:Group op e inv aeq, H:context [aeq (inv ?a) e] |- _] =>
+       | [G:Group aeq op e inv, H:context [aeq (inv ?a) e] |- _] =>
            rewrite (group_opp_eq0_iff a) in H
-       | [G:Group op e inv aeq |- context [aeq (inv ?a) e]] =>
+       | [G:Group aeq op e inv |- context [aeq (inv ?a) e]] =>
            rewrite (group_opp_eq0_iff a)
        (* a + b == a *)
-       | [G:Group op e inv aeq, H: aeq (op ?a ?b) ?a |- _] =>
+       | [G:Group aeq op e inv, H: aeq (op ?a ?b) ?a |- _] =>
            apply group_add_eq_l_inv in H
-       | [G:Group op e inv aeq |- aeq (op ?a ?b) ?a] =>
+       | [G:Group aeq op e inv |- aeq (op ?a ?b) ?a] =>
            apply group_add_eq_l
        (* a == a + b *)
-       | [G:Group op e inv aeq, H: aeq ?a (op ?a ?b) |- _] =>
+       | [G:Group aeq op e inv, H: aeq ?a (op ?a ?b) |- _] =>
            symmetry in H; apply group_add_eq_l_inv in H
-       | [G:Group op e inv aeq |- aeq ?a (op ?a ?b)] =>
+       | [G:Group aeq op e inv |- aeq ?a (op ?a ?b)] =>
            symmetry; apply group_add_eq_l
        (* a + b == b *)
-       | [G:Group op e inv aeq, H: aeq (op ?a ?b) ?b |- _] =>
+       | [G:Group aeq op e inv, H: aeq (op ?a ?b) ?b |- _] =>
            apply group_add_eq_r_inv in H
-       | [G:Group op e inv aeq |- aeq (op ?a ?b) ?b] =>
+       | [G:Group aeq op e inv |- aeq (op ?a ?b) ?b] =>
            apply group_add_eq_r
        (* b == a + b *)
-       | [G:Group op e inv aeq, H: aeq ?b (op ?a ?b) |- _] =>
+       | [G:Group aeq op e inv, H: aeq ?b (op ?a ?b) |- _] =>
            symmetry in H; apply group_add_eq_r_inv in H
-       | [G:Group op e inv aeq |- aeq ?b (op ?a ?b)] =>
+       | [G:Group aeq op e inv |- aeq ?b (op ?a ?b)] =>
            symmetry; apply group_add_eq_r
        (* (a + b) + c == a *)
-       | [G:Group op e inv aeq, H: aeq (?op (?op ?a ?b) ?c) ?a |- _] =>
+       | [G:Group aeq op e inv, H: aeq (?op (?op ?a ?b) ?c) ?a |- _] =>
            rewrite (associative a b c) in H; apply group_add_eq_l_inv in H
-       | [G:Group op e inv aeq |- aeq (?op (?op ?a ?b) ?c) ?a] =>
+       | [G:Group aeq op e inv |- aeq (?op (?op ?a ?b) ?c) ?a] =>
            rewrite (associative a b c); apply group_add_eq_l
        (* a == (a + b) + c *)
-       | [G:Group op e inv aeq, H: aeq ?a (?op (?op ?a ?b) ?c) |- _] =>
+       | [G:Group aeq op e inv, H: aeq ?a (?op (?op ?a ?b) ?c) |- _] =>
            symmetry in H;
            rewrite (associative a b c) in H; apply group_add_eq_l_inv in H
-       | [G:Group op e inv aeq |- aeq ?a (?op (?op ?a ?b) ?c)] =>
+       | [G:Group aeq op e inv |- aeq ?a (?op (?op ?a ?b) ?c)] =>
            symmetry; rewrite (associative a b c); apply group_add_eq_l
        (* (a + b) + c == b, need commutative *)
        (* b == (a + b) + c, need commutative *)
@@ -1722,22 +1676,22 @@ Ltac group_advanced_only op e inv aeq :=
 
        (* ------------ simplify in goal only ------------ *)
        (* - a == b |- a == - b *)
-       | [G:Group op e inv aeq, H:context [aeq (inv ?a) ?b] |- aeq ?a (inv ?b)] =>
+       | [G:Group aeq op e inv, H:context [aeq (inv ?a) ?b] |- aeq ?a (inv ?b)] =>
            apply group_opp_exchg_l
        (* a == - b |- - a == b *)
-       | [G:Group op e inv aeq, H:context [aeq ?a (inv ?b)] |- aeq (inv ?a) ?b] =>
+       | [G:Group aeq op e inv, H:context [aeq ?a (inv ?b)] |- aeq (inv ?a) ?b] =>
            apply group_opp_exchg_r
        end;
-     try easy).
+     auto; try easy).
 
-(* Simplfy expressions on group <G, op, e, inv, aeq> *)
-Ltac group_core op e inv aeq :=
-  try group_advanced_only op e inv aeq;
+(* Simplfy expressions on group <G, aeq, op, e, inv> *)
+Ltac group_core aeq op e inv :=
+  try group_advanced_only aeq op e inv;
   try group_basic. (* it will also call `group_smaller` *)
   
 (* Simplfy expressions on group in current context *)
 Ltac group :=
-  try match goal with G:Group ?op ?e ?inv ?aeq |- _ => group_core op e inv aeq end;
+  try match goal with G:Group ?aeq ?op ?e ?inv |- _ => group_core aeq op e inv end;
   try group_smaller.
 
 (** ** Instances *)
@@ -1781,17 +1735,17 @@ End Examples.
 (** * Abelian Group *)
 
 (** ** Class *)
-Class AGroup {A} Aadd Azero Aopp Aeq := {
-    agroupGroup :: @Group A Aadd Azero Aopp Aeq;
-    agroupComm :: Commutative Aadd Aeq;
-    agroupAM :: AMonoid Aadd Azero Aeq;
+Class AGroup {A} Aeq Aadd Azero Aopp := {
+    agroupGroup :: @Group A Aeq Aadd Azero Aopp;
+    agroupComm :: Commutative Aeq Aadd;
+    agroupAM :: AMonoid Aeq Aadd Azero;
   }.
 Coercion agroupGroup : AGroup >-> Group.
 (* Coercion agroupComm : AGroup >-> Commutative. *)
 Coercion agroupAM : AGroup >-> AMonoid.
 
-Arguments agroupGroup {A Aadd Azero Aopp Aeq}.
-Arguments agroupAM {A Aadd Azero Aopp Aeq}.
+Arguments agroupGroup {A Aeq Aadd Azero Aopp}.
+Arguments agroupAM {A Aeq Aadd Azero Aopp}.
 
 (** ** Theories *)
 Section Theory.
@@ -1831,32 +1785,32 @@ End Theory.
 (* handle structures smaller than this *)
 Ltac agroup_smaller :=
   match goal with
-  | G:Group ?op ?e ?inv ?aeq |- _ => group_core op e inv aeq
-  | AM:AMonoid ?op ?e ?aeq |- _ => amonoid_core op e aeq
-  | M:Monoid ?op ?e ?aeq |- _ => monoid_core op e aeq
-  | ASG:ASGroup ?op ?aeq |- _ => asgroup_core op aeq
-  | SG:ASGroup ?op ?aeq |- _ => sgroup_core op aeq
+  | G:Group ?aeq ?op ?e ?inv |- _ => group_core aeq op e inv
+  | AM:AMonoid ?aeq ?op ?e |- _ => amonoid_core aeq op e
+  | M:Monoid ?aeq ?op ?e |- _ => monoid_core aeq op e
+  | ASG:ASGroup ?aeq ?op |- _ => asgroup_core aeq op
+  | SG:ASGroup ?aeq ?op |- _ => sgroup_core aeq op
   end.
 
 (* Simplify expressions on Abelian group <op, e, inv, aeq> *)
-Ltac agroup_core op e inv aeq :=
+Ltac agroup_core aeq op e inv :=
   repeat
     (try
        match goal with
        (* G + AM，则顺序执行二者 *)
-       | G:Group op e inv aeq, AM:AMonoid op e aeq |- _ =>
-           group_core op e inv aeq; amonoid_core op e aeq
+       | G:Group aeq op e inv, AM:AMonoid aeq op e |- _ =>
+           group_core aeq op e inv; amonoid_core aeq op e
        (* AG，则先转换为 G + AM *)
-       | AG:AGroup op e inv aeq |- _ =>
+       | AG:AGroup aeq op e inv |- _ =>
            try pose proof (agroupGroup AG) as HGroup;
            try pose proof (agroupAM AG) as HAMonoid
        end;
-     try easy);
+     auto; try easy);
   try agroup_smaller.
 
 (* Simplify expressions on Abelian group in current context *)
 Ltac agroup :=
-  try match goal with AG:AGroup ?op ?e ?inv ?aeq |- _ => agroup_core op e inv aeq end;
+  try match goal with AG:AGroup ?aeq ?op ?e ?inv |- _ => agroup_core aeq op e inv end;
   try agroup_smaller.
 
 (** ** Instances *)
@@ -1886,11 +1840,11 @@ End Examples.
 
 (** ** Class *)
 
-Class SRing {A} Aadd Azero Amul Aone Aeq := {
-    sringAddAM :: @AMonoid A Aadd Azero Aeq; (* 不确定交换性是否必要，姑且先留下 *)
-    sringMulAM :: AMonoid Amul Aone Aeq; (* 不确定交换性是否必要，姑且先留下 *)
-    sringDistrL :: DistrLeft Aadd Amul Aeq;
-    sringDistrR :: DistrRight Aadd Amul Aeq;
+Class SRing {A} Aeq Aadd Azero Amul Aone := {
+    sringAddAM :: @AMonoid A Aeq Aadd Azero; (* 不确定交换性是否必要，姑且先留下 *)
+    sringMulAM :: AMonoid Aeq Amul Aone; (* 不确定交换性是否必要，姑且先留下 *)
+    sringDistrL :: DistrLeft Aeq Aadd Amul;
+    sringDistrR :: DistrRight Aeq Aadd Amul;
   }.
 Coercion sringAddAM : SRing >-> AMonoid.
 Coercion sringMulAM : SRing >-> AMonoid.
@@ -1913,18 +1867,18 @@ Coercion sringMulAM : SRing >-> AMonoid.
    but ring theory in Coq need it.
    We will distinguish ring and abelian ring with class name Ring and ARing.  *)
 
-Class Ring {A} Aadd Azero Aopp Amul Aone Aeq := {
-    ringAddAG :: @AGroup A Aadd Azero Aopp Aeq;
-    ringMulM :: Monoid Amul Aone Aeq;
-    ringDistrL :: DistrLeft Aadd Amul Aeq;
-    ringDistrR :: DistrRight Aadd Amul Aeq;
+Class Ring {A} Aeq Aadd Azero Aopp Amul Aone := {
+    ringAddAG :: @AGroup A Aeq Aadd Azero Aopp;
+    ringMulM :: Monoid Aeq Amul Aone;
+    ringDistrL :: DistrLeft Aeq Aadd Amul;
+    ringDistrR :: DistrRight Aeq Aadd Amul;
   }.
 Coercion ringAddAG : Ring >-> AGroup.
 Coercion ringMulM : Ring >-> Monoid.
 (* Coercion ringDistrL : Ring >-> DistrLeft. *)
 (* Coercion ringDistrR : Ring >-> DistrRight. *)
 
-Arguments ringAddAG {A Aadd Azero Aopp Amul Aone Aeq}.
+Arguments ringAddAG {A Aeq Aadd Azero Aopp Amul Aone}.
 
 (** ** Theories *)
 Section Theory.
@@ -1949,10 +1903,10 @@ End Theory.
 
 (** ** Class *)
 
-Class ARing {A} Aadd Azero Aopp Amul Aone Aeq := {
-    aringRing :: @Ring A Aadd Azero Aopp Amul Aone Aeq;
-    aringMulComm :: Commutative Amul Aeq;
-    aringMulAM :: AMonoid Amul Aone Aeq;
+Class ARing {A} Aeq Aadd Azero Aopp Amul Aone := {
+    aringRing :: @Ring A Aeq Aadd Azero Aopp Amul Aone;
+    aringMulComm :: Commutative Aeq Amul;
+    aringMulAM :: AMonoid Aeq Amul Aone;
   }.
 Coercion aringRing : ARing >-> Ring.
 (* Coercion aringMulComm : ARing >-> Commutative. *)
@@ -2088,7 +2042,7 @@ Module Demo_concrate_ring.
   (* Add Ring ring_thy_inst1 : ring_thy. *)
   
   (* Method 2: first construct ARing structure, then use make_ring_theory *)
-  Lemma ARing_inst : ARing add 0 opp mul 1 eq.
+  Lemma ARing_inst : ARing eq add 0 opp mul 1.
   Proof.
     repeat constructor; hnf; intros; hnf; intros;
       repeat match goal with a : A |- _ => destruct a; auto; try easy end.
@@ -2106,9 +2060,9 @@ End Demo_concrate_ring.
 (** * Field *)
 
 (** ** Class *)
-Class Field {A} Aadd (Azero:A) Aopp Amul Aone Ainv Aeq := {
-    fieldRing :: ARing Aadd Azero Aopp Amul Aone Aeq;
-    fieldAinvProper :: Proper (Aeq ==> Aeq) Ainv;
+Class Field {A} Aeq Aadd (Azero:A) Aopp Amul Aone Ainv := {
+    fieldRing :: ARing Aeq Aadd Azero Aopp Amul Aone;
+    fieldAinv_wd :: Proper (Aeq ==> Aeq) Ainv;
     field_mulInvL : forall a, ~(Aeq a Azero) -> Aeq (Amul (Ainv a) a) Aone;
     field_1_neq_0 : ~(Aeq Aone Azero);
     
@@ -2331,9 +2285,9 @@ End Theory.
    thus the developer needn't and shouldn't to define another less-then relation,
    such as Qle, Rle etc. *)
 Class Order {A} (Aeq Alt Ale : relation A) := {
-    order_Aeq_equiv :: Equivalence Aeq;
+    order_eq_Equiv :: Equivalence Aeq;
     (* Alt is consistent with Aeq *)
-    lt_aeq :: Proper (Aeq ==> Aeq ==> iff) Alt;
+    order_lt_wd :: Proper (Aeq ==> Aeq ==> iff) Alt;
     (* Alt is anti-reflexivi *)
     lt_irrefl : forall a : A, ~ (Alt a a);
     (* Alt is anti-symmetric *)
@@ -2362,7 +2316,7 @@ Section eq.
     - right; intro. rewrite H in *. apply lt_irrefl in H1; auto.
   Defined.
 
-  #[export] Instance eq_Dec : Dec Aeq.
+  #[export] Instance order_eq_Dec : Dec Aeq.
   Proof. constructor. intro. apply eq_dec. Defined.
 End eq.
 
@@ -2423,7 +2377,7 @@ Section le.
   Infix "<=" := Ale.
 
   (** Ale is consistent with Aeq  *)
-  #[export] Instance le_aeq : Proper (Aeq ==> Aeq ==> iff) Ale.
+  #[export] Instance le_wd : Proper (Aeq ==> Aeq ==> iff) Ale.
   Proof.
     simp_proper; intros; split; intros.
     - apply lt_le_cong. apply lt_le_cong in H1. rewrite H,H0 in *. auto.
@@ -2552,7 +2506,7 @@ Ltac order_core aeq lt le :=
        | H: Order aeq lt le, H1: ~(aeq ?a ?b), H2: le ?a ?b |- lt ?a ?b =>
            apply lt_if_le_and_neq
        end;
-     try easy).
+     auto; try easy).
 
 (** Simplify expressions on Order in current context *)
 Ltac order :=
@@ -2584,8 +2538,8 @@ End test.
 (* ######################################################################### *)
 (** * Abelian-ring with total order *)
 
-Class OrderedARing {A} Aadd Azero Aopp Amul Aone Aeq Alt Ale := {
-    or_ARing :: @ARing A Aadd Azero Aopp Amul Aone Aeq;
+Class OrderedARing {A} Aeq Aadd Azero Aopp Amul Aone Alt Ale := {
+    or_ARing :: @ARing A Aeq Aadd Azero Aopp Amul Aone;
     or_Order :: Order Aeq Alt Ale;
     (* Lt is compatible with addition operation: a < b -> a + c < a + c *)
     lt_add_compat_r : forall a b c : A, Alt a b -> Alt (Aadd a c) (Aadd b c);
@@ -3074,9 +3028,9 @@ End theories.
 (* ######################################################################### *)
 (** * Field with total order *)
 
-Class OrderedField {A} Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale := {
-    ofField :: @Field A Aadd Azero Aopp Amul Aone Ainv Aeq;
-    ofOrderedARing :: OrderedARing Aadd Azero Aopp Amul Aone Aeq Alt Ale;
+Class OrderedField {A} Aeq Aadd Azero Aopp Amul Aone Ainv Alt Ale := {
+    ofField :: @Field A Aeq Aadd Azero Aopp Amul Aone Ainv;
+    ofOrderedARing :: OrderedARing Aeq Aadd Azero Aopp Amul Aone Alt Ale;
   }.
 Coercion ofField : OrderedField >-> Field.
 Coercion ofOrderedARing : OrderedField >-> OrderedARing.
@@ -3199,7 +3153,7 @@ End Theory.
 (** * Convert to R type *)
 
 (** Operations {+,0,-x,*,1,/x,==,<,<=} is consistent with "a2r: A -> R" *)
-Class A2R {A} Aadd Azero Aopp Amul Aone Ainv Aeq Alt Ale (a2r : A -> R)
+Class A2R {A} Aeq Aadd Azero Aopp Amul Aone Ainv Alt Ale (a2r : A -> R)
   := {
     (* a2r (a + b) = a2r a + a2r b *)
     a2r_add : forall a b : A, a2r (Aadd a b) = (a2r a + a2r b)%R;
@@ -3250,7 +3204,7 @@ Section Theory.
 
   Section OrderedARing.
     Context `{HOrderedARing :
-        OrderedARing A Aadd 0 Aopp Amul 1 Aeq Alt Ale}.
+        OrderedARing A Aeq Aadd 0 Aopp Amul 1 Alt Ale}.
     Notation "| a |" := (Rabs a) : R_scope.
     Notation "| a |" := (Aabs a) : A_scope.
 
@@ -3279,7 +3233,7 @@ End Theory.
 (** Adist:A×A→R(>=0) is a metric over A, if it satisfy three axioms.
     Then, (A, Adist) is called a metric space, and Adist(a,b) is called the 
     distance between point a and b in (A,dist)     *)
-Class MetricSpace {A} (Adist : A -> A -> R) Aeq := {
+Class MetricSpace {A} Aeq (Adist : A -> A -> R) := {
     ms_gt0 : forall a b : A, (R0 <= Adist a b)%R;
     ms_eq0_iff_eq : forall a b : A, Adist a b = R0 <-> Aeq a b;
     ms_sym : forall a b : A, Adist a b = Adist b a;

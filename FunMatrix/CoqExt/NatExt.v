@@ -38,10 +38,10 @@ Proof. constructor. intros. destruct (le_lt_dec a b); auto. right. lia. Defined.
 
 (** Associative *)
 
-#[export] Instance natAdd_Assoc : Associative Nat.add eq.
+#[export] Instance natAdd_Assoc : Associative eq Nat.add.
 Proof. constructor; intros; ring. Qed.
 
-#[export] Instance natMul_Assoc : Associative Nat.mul eq.
+#[export] Instance natMul_Assoc : Associative eq Nat.mul.
 Proof. constructor; intros; ring. Qed.
 
 Hint Resolve natAdd_Assoc natMul_Assoc : nat.
@@ -54,10 +54,10 @@ Proof. apply associative. Qed.
 
 (** Commutative *)
 
-#[export] Instance natAdd_Comm : Commutative Nat.add eq.
+#[export] Instance natAdd_Comm : Commutative eq Nat.add.
 Proof. constructor; intros; ring. Qed.
 
-#[export] Instance natMul_Comm : Commutative Nat.mul eq.
+#[export] Instance natMul_Comm : Commutative eq Nat.mul.
 Proof. constructor; intros; ring. Qed.
 
 Hint Resolve natAdd_Comm natMul_Comm : nat.
@@ -69,16 +69,16 @@ Goal forall a b : nat, (a * b = b * a)%nat.
 Proof. apply commutative. Qed.
 
 (** Identity Left/Right *)
-#[export] Instance natAdd_IdL : IdentityLeft Nat.add 0 eq.
+#[export] Instance natAdd_IdL : IdentityLeft eq Nat.add 0.
 Proof. constructor; intros; ring. Qed.
 
-#[export] Instance natAdd_IdR : IdentityRight Nat.add 0 eq.
+#[export] Instance natAdd_IdR : IdentityRight eq Nat.add 0.
 Proof. constructor; intros; ring. Qed.
 
-#[export] Instance natMul_IdL : IdentityLeft Nat.mul 1 eq.
+#[export] Instance natMul_IdL : IdentityLeft eq Nat.mul 1.
 Proof. constructor; intros; ring. Qed.
 
-#[export] Instance natMul_IdR : IdentityRight Nat.mul 1 eq.
+#[export] Instance natMul_IdR : IdentityRight eq Nat.mul 1.
 Proof. constructor; intros; ring. Qed.
 
 Hint Resolve
@@ -89,20 +89,20 @@ Hint Resolve
 
 (** Distributive *)
 
-#[export] Instance natMul_add_DistrL : DistrLeft Nat.add Nat.mul eq.
+#[export] Instance natMul_add_DistrL : DistrLeft eq Nat.add Nat.mul.
 Proof. constructor; intros; ring. Qed.
 
-#[export] Instance natMul_add_DistrR : DistrRight Nat.add Nat.mul eq.
+#[export] Instance natMul_add_DistrR : DistrRight eq Nat.add Nat.mul.
 Proof. constructor; intros; ring. Qed.
 
 Hint Resolve natMul_add_DistrL natMul_add_DistrR : nat.
 
 (** Semigroup *)
 
-#[export] Instance natAdd_SGroup : SGroup Nat.add eq.
+#[export] Instance natAdd_SGroup : SGroup eq Nat.add.
 Proof. constructor; auto with nat. Qed.
 
-#[export] Instance natMul_SGroup : SGroup Nat.mul eq.
+#[export] Instance natMul_SGroup : SGroup eq Nat.mul.
 Proof. constructor; auto with nat. Qed.
 
 Hint Resolve
@@ -112,10 +112,10 @@ Hint Resolve
 
 (** Abelian semigroup *)
 
-#[export] Instance natAdd_ASGroup : ASGroup Nat.add eq.
+#[export] Instance natAdd_ASGroup : ASGroup eq Nat.add.
 Proof. constructor; auto with nat. Qed.
 
-#[export] Instance natMul_ASGroup : ASGroup Nat.mul eq.
+#[export] Instance natMul_ASGroup : ASGroup eq Nat.mul.
 Proof. constructor; auto with nat. Qed.
 
 Hint Resolve
@@ -129,10 +129,10 @@ Proof. intros. pose proof natAdd_ASGroup. asgroup. Qed.
 
 (** Monoid *)
   
-#[export] Instance natAdd_Monoid : Monoid Nat.add 0 eq.
+#[export] Instance natAdd_Monoid : Monoid eq Nat.add 0.
 Proof. constructor; auto with nat. Qed.
 
-#[export] Instance natMul_Monoid : Monoid Nat.mul 1 eq.
+#[export] Instance natMul_Monoid : Monoid eq Nat.mul 1.
 Proof. constructor; auto with nat. Qed.
 
 Hint Resolve
@@ -142,10 +142,10 @@ Hint Resolve
 
 (** Abelian monoid *)
   
-#[export] Instance natAdd_AMonoid : AMonoid Nat.add 0 eq.
+#[export] Instance natAdd_AMonoid : AMonoid eq Nat.add 0.
 Proof. constructor; auto with nat. Qed.
   
-#[export] Instance natMul_AMonoid : AMonoid Nat.mul 1 eq.
+#[export] Instance natMul_AMonoid : AMonoid eq Nat.mul 1.
 Proof. constructor; auto with nat. Qed.
 
 (** Order *)

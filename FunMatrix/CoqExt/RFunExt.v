@@ -15,6 +15,7 @@
  *)
 
 Require Export RExt.
+Require Import FuncExt.
 Open Scope R_scope.
 Open Scope Rfun_scope.
 
@@ -171,26 +172,29 @@ Hint Resolve eq_equivalence : Rfun.
 
 (** operations are well-defined. Eg: Proper (eq ==> eq ==> eq) faddR *)
 
-#[export] Instance faddR_wd : Proper (eq ==> eq ==> eq) faddR.
+Lemma faddR_wd : Proper (eq ==> eq ==> eq) faddR.
 Proof. simp_proper. intros; subst; auto. Qed.
 
-#[export] Instance foppR_wd : Proper (eq ==> eq) foppR.
+Lemma foppR_wd : Proper (eq ==> eq) foppR.
 Proof. simp_proper. intros; subst; auto. Qed.
 
-#[export] Instance fmulR_wd : Proper (eq ==> eq ==> eq) fmulR.
+Lemma fmulR_wd : Proper (eq ==> eq ==> eq) fmulR.
+Proof. simp_proper. intros; subst; auto. Qed.
+
+Lemma finvR_wd : Proper (eq ==> eq) finvR.
 Proof. simp_proper. intros; subst; auto. Qed.
 
 Hint Resolve
-  faddR_wd
-  fmulR_wd
+  faddR_wd foppR_wd
+  fmulR_wd finvR_wd
   : Rfun.
 
 (** Associative *)
 
-#[export] Instance faddR_Assoc : Associative faddR eq.
+#[export] Instance faddR_Assoc : Associative eq faddR.
 Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
 
-#[export] Instance fmulR_Assoc : Associative fmulR eq.
+#[export] Instance fmulR_Assoc : Associative eq fmulR.
 Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
 
 Hint Resolve
@@ -200,10 +204,10 @@ Hint Resolve
 
 (** Commutative *)
 
-#[export] Instance faddR_Comm : Commutative faddR eq.
+#[export] Instance faddR_Comm : Commutative eq faddR.
 Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
 
-#[export] Instance fmulR_Comm : Commutative fmulR eq.
+#[export] Instance fmulR_Comm : Commutative eq fmulR.
 Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
 
 Hint Resolve
@@ -212,33 +216,39 @@ Hint Resolve
   : Rfun.
 
 (** Identity Left/Right *)
-#[export] Instance faddR_IdL : IdentityLeft faddR 0 eq.
+#[export] Instance faddR_IdL : IdentityLeft eq faddR 0.
 Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
 
-#[export] Instance faddR_IdR : IdentityRight faddR 0 eq.
+#[export] Instance faddR_IdR : IdentityRight eq faddR 0.
 Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
 
-#[export] Instance fmulR_IdL : IdentityLeft fmulR 1 eq.
+#[export] Instance fmulR_IdL : IdentityLeft eq fmulR 1.
 Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
 
-#[export] Instance fmulR_IdR : IdentityRight fmulR 1 eq.
+#[export] Instance fmulR_IdR : IdentityRight eq fmulR 1.
 Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
 
 Hint Resolve
-  faddR_IdL
-  faddR_IdR
-  fmulR_IdL
-  fmulR_IdR
+  faddR_IdL faddR_IdR
+  fmulR_IdL fmulR_IdR
   : Rfun.
 
 (** Inverse Left/Right *)
 
-(** Distributive *)
-
-#[export] Instance fmulR_add_DistrL : DistrLeft faddR fmulR eq.
+#[export] Instance faddR_InvL : InverseLeft eq faddR 0 foppR.
 Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
 
-#[export] Instance fmulR_add_DistrR : DistrRight faddR fmulR eq.
+#[export] Instance faddR_InvR : InverseRight eq faddR 0 foppR.
+Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
+
+Hint Resolve faddR_InvL faddR_InvR : Rfun.
+
+(** Distributive *)
+
+#[export] Instance fmulR_add_DistrL : DistrLeft eq faddR fmulR.
+Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
+
+#[export] Instance fmulR_add_DistrR : DistrRight eq faddR fmulR.
 Proof. constructor; intros. autounfold with Rfun; apply feq_iff; intros; ring. Qed.
 
 Hint Resolve
@@ -248,10 +258,10 @@ Hint Resolve
 
 (** Semigroup *)
 
-#[export] Instance faddR_SGroup : SGroup faddR eq.
+#[export] Instance faddR_SGroup : SGroup eq faddR.
 Proof. constructor; auto with Rfun. Qed.
 
-#[export] Instance fmulR_SGroup : SGroup fmulR eq.
+#[export] Instance fmulR_SGroup : SGroup eq fmulR.
 Proof. constructor; auto with Rfun. Qed.
 
 Hint Resolve
@@ -261,10 +271,10 @@ Hint Resolve
 
 (** Abelian semigroup *)
 
-#[export] Instance faddR_ASGroup : ASGroup faddR eq.
+#[export] Instance faddR_ASGroup : ASGroup eq faddR.
 Proof. constructor; auto with Rfun. Qed.
 
-#[export] Instance fmulR_ASGroup : ASGroup fmulR eq.
+#[export] Instance fmulR_ASGroup : ASGroup eq fmulR.
 Proof. constructor; auto with Rfun. Qed.
 
 Hint Resolve
@@ -277,10 +287,10 @@ Proof. intros. pose proof faddR_ASGroup. asgroup. Abort.
 
 (** Monoid *)
   
-#[export] Instance faddR_Monoid : Monoid faddR 0 eq.
+#[export] Instance faddR_Monoid : Monoid eq faddR 0.
 Proof. constructor; auto with Rfun. Qed.
 
-#[export] Instance fmulR_Monoid : Monoid fmulR 1 eq.
+#[export] Instance fmulR_Monoid : Monoid eq fmulR 1.
 Proof. constructor; auto with Rfun. Qed.
 
 Hint Resolve
@@ -290,71 +300,65 @@ Hint Resolve
 
 (** Abelian monoid *)
   
-#[export] Instance faddR_AMonoid : AMonoid faddR 0 eq.
+#[export] Instance faddR_AMonoid : AMonoid eq faddR 0.
 Proof. constructor; auto with Rfun. Qed.
   
-#[export] Instance fmulR_AMonoid : AMonoid fmulR 1 eq.
+#[export] Instance fmulR_AMonoid : AMonoid eq fmulR 1.
 Proof. constructor; auto with Rfun. Qed.
 
+Hint Resolve faddR_AMonoid fmulR_AMonoid : Rfun.
 
-(* (** Properties for real function subtraction *) *)
-(* Lemma fsubR_add : forall (u v w : R -> R), u - (v + w) = u - v - w. *)
-(* Proof. intros. pose proof faddR_AMonoid. agroup. Qed. *)
+(** Group *)
 
-(* (** Group structure over (Rfun,+,0,-) *) *)
-(* #[export] Instance Group_RfunAdd : Group faddR fzeroR foppR. *)
-(* Proof. *)
-(*   constructor. apply AMonoid_RfunAdd. *)
-(*   constructor. apply faddR_opp_l. *)
-(*   constructor. apply faddR_opp_r. *)
-(* Qed. *)
+#[export] Instance faddR_Group : Group eq faddR 0 foppR.
+Proof. constructor; auto with Rfun. Qed.
 
-(* (** Abelian group structure over (Rfun,+,0,-) *) *)
-(* #[export] Instance AGroup_RfunAdd : AGroup faddR fzeroR foppR. *)
-(* Proof. *)
-(*   constructor. apply Group_RfunAdd. apply AMonoid_RfunAdd. *)
-(*   constructor; apply faddR_comm. *)
-(* Qed. *)
+Hint Resolve faddR_Group : Rfun.
 
-(* (** Ring structure *) *)
-(* #[export] Instance ARing_Rfun : ARing faddR fzeroR foppR fmulR foneR. *)
-(* Proof. *)
-(*   repeat constructor; try apply AGroup_RfunAdd; try apply AMonoid_RfunMul. *)
-(*   apply fmulR_add_distr_l. *)
-(*   apply fmulR_add_distr_r. *)
-(* Qed. *)
+(** AGroup *)
 
+#[export] Instance faddR_AGroup : AGroup eq faddR 0 foppR.
+Proof. constructor; auto with Rfun. Qed.
 
-(* Section test. *)
-(*   Add Ring ring_inst : (@make_ring_theory _ _ _ _ _ _ ARing_Rfun). *)
-(*   Goal forall u v w : R -> R, u - v * (u - w) = w * v - u * v + u. *)
-(*     intros. unfold fsubR. ring. Qed. *)
-  
-(* End test. *)
+Hint Resolve faddR_AGroup : Rfun.
 
-(* (** An example showed that "R->R" and "tpRfun" are different in Coq when using ring  *)
-(*     tactic. *) *)
-(* Section test. *)
-(*   (* If we use "tpRfun", then it success *) *)
-(*   Goal let f : tpRfun := foneR in f = f. *)
-(*     simpl. ring. Qed. *)
+(** Ring *)
 
-(*   (* If we use "R->R", then it fail *) *)
-(*   Goal let f : R -> R := foneR in f = f. *)
-(*     simpl. Fail ring. *)
-(*     unfold foneR. unfold fcnstR. *)
-(*     Fail ring. Abort. *)
-(* End test. *)
+#[export] Instance Rfun_Ring : Ring eq faddR 0 foppR fmulR 1.
+Proof. constructor; auto with Rfun. Qed.
 
-(* (** add this declaration to enable ring support over "R->R" type *) *)
-(* Add Ring ring_inst : (@make_ring_theory (R->R) _ _ _ _ _ ARing_Rfun). *)
-(* Section test. *)
-(*   (* Now, we can use "ring" tactic successfully  *) *)
-(*   Goal let f : R -> R := foneR in f = f. *)
-(*     simpl. Fail ring. *)
-(*     unfold foneR. unfold fcnstR. ring. *)
-(*   Qed. *)
-(* End test. *)
+Hint Resolve Rfun_Ring : Rfun.
+
+(** ARing *)
+
+#[export] Instance Rfun_ARing : ARing eq faddR 0 foppR fmulR 1.
+Proof. constructor; auto with Rfun. Qed.
+
+Hint Resolve Rfun_ARing : Rfun.
+
+Section test.
+  Add Ring ring_inst : (make_ring_theory Rfun_ARing).
+
+  Goal forall u v w : R -> R, u - v * (u - w) = w * v - u * v + u.
+  Proof. intros. ring. Qed.
+End test.
+
+(** Field *)
+
+#[export] Instance Rfun_Field : Field eq faddR 0 foppR fmulR 1 finvR.
+Proof.
+  constructor; auto with Rfun.
+  2:{ intro. cbv in H.
+      rewrite fun_eq_iff_forall_eq in H. specialize (H R0). lra. }
+  1:{ intros. apply fmulR_inv_l.
+      cbv in H.
+      (* tips, THIS IS NOT PROVABLE. WE KNOW "exist", BUT NEED "forall"
+         f : R -> R,
+         f <> (fun _ : R => R0)
+         ---------------------------
+         forall x : R, f x <> R0
+       *)
+Abort.
 
 
 (* ######################################################################### *)

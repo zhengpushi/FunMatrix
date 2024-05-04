@@ -535,7 +535,7 @@ Proof. auto. Qed.
 Lemma C0_pow : forall n, (0 < n)%nat -> C0 ^ n = C0.
 Proof.
   induction n; intros; auto. lia.
-  destruct (Aeqdec n 0%nat).
+  destruct (Nat.eq_dec n 0).
   - rewrite e. Ceq.
   - simpl. rewrite IHn. Ceq. lia.
 Qed.
@@ -1306,10 +1306,10 @@ Hint Resolve
 
 (** Associative *)
 
-#[export] Instance Cadd_Assoc : Associative Cadd eq.
+#[export] Instance Cadd_Assoc : Associative eq Cadd.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Cmul_Assoc : Associative Cmul eq.
+#[export] Instance Cmul_Assoc : Associative eq Cmul.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve
@@ -1319,25 +1319,25 @@ Hint Resolve
 
 (** Commutative *)
 
-#[export] Instance Cadd_Comm : Commutative Cadd eq.
+#[export] Instance Cadd_Comm : Commutative eq Cadd.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Cmul_Comm : Commutative Cmul eq.
+#[export] Instance Cmul_Comm : Commutative eq Cmul.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve Cadd_Comm Cmul_Comm : C.
 
 (** Identity Left/Right *)
-#[export] Instance Cadd_IdL : IdentityLeft Cadd C0 eq.
+#[export] Instance Cadd_IdL : IdentityLeft eq Cadd C0.
 Proof. constructor. intros. field. Qed.
 
-#[export] Instance Cadd_IdR : IdentityRight Cadd C0 eq.
+#[export] Instance Cadd_IdR : IdentityRight eq Cadd C0.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Cmul_IdL : IdentityLeft Cmul C1 eq.
+#[export] Instance Cmul_IdL : IdentityLeft eq Cmul C1.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Cmul_IdR : IdentityRight Cmul C1 eq.
+#[export] Instance Cmul_IdR : IdentityRight eq Cmul C1.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve
@@ -1349,12 +1349,20 @@ Hint Resolve
 
 (** Inverse Left/Right *)
 
+#[export] Instance Cadd_InvL : InverseLeft eq Cadd C0 Copp.
+Proof. constructor; intros; ring. Qed.
+
+#[export] Instance Cadd_InvC : InverseRight eq Cadd C0 Copp.
+Proof. constructor; intros; ring. Qed.
+
+Hint Resolve Cadd_InvL Cadd_InvC : C.
+
 (** Distributive *)
 
-#[export] Instance Cmul_add_DistrL : DistrLeft Cadd Cmul eq.
+#[export] Instance Cmul_add_DistrL : DistrLeft eq Cadd Cmul.
 Proof. constructor; intros; field. Qed.
 
-#[export] Instance Cmul_add_DistrR : DistrRight Cadd Cmul eq.
+#[export] Instance Cmul_add_DistrR : DistrRight eq Cadd Cmul.
 Proof. constructor; intros; field. Qed.
 
 Hint Resolve
@@ -1364,10 +1372,10 @@ Hint Resolve
 
 (** Semigroup *)
 
-#[export] Instance Cadd_SGroup : SGroup Cadd eq.
+#[export] Instance Cadd_SGroup : SGroup eq Cadd.
 Proof. constructor; auto with C. Qed.
 
-#[export] Instance Cmul_SGroup : SGroup Cmul eq.
+#[export] Instance Cmul_SGroup : SGroup eq Cmul.
 Proof. constructor; auto with C. Qed.
 
 Hint Resolve
@@ -1377,10 +1385,10 @@ Hint Resolve
 
 (** Abelian semigroup *)
 
-#[export] Instance Cadd_ASGroup : ASGroup Cadd eq.
+#[export] Instance Cadd_ASGroup : ASGroup eq Cadd.
 Proof. constructor; auto with C. Qed.
 
-#[export] Instance Cmul_ASGroup : ASGroup Cmul eq.
+#[export] Instance Cmul_ASGroup : ASGroup eq Cmul.
 Proof. constructor; auto with C. Qed.
 
 Hint Resolve
@@ -1390,10 +1398,10 @@ Hint Resolve
 
 (** Monoid *)
   
-#[export] Instance Cadd_Monoid : Monoid Cadd C0 eq.
+#[export] Instance Cadd_Monoid : Monoid eq Cadd C0.
 Proof. constructor; auto with C. Qed.
 
-#[export] Instance Cmul_Monoid : Monoid Cmul C1 eq.
+#[export] Instance Cmul_Monoid : Monoid eq Cmul C1.
 Proof. constructor; auto with C. Qed.
 
 Hint Resolve
@@ -1403,39 +1411,45 @@ Hint Resolve
 
 (** Abelian monoid *)
   
-#[export] Instance Cadd_AMonoid : AMonoid Cadd C0 eq.
+#[export] Instance Cadd_AMonoid : AMonoid eq Cadd C0.
 Proof. constructor; auto with C. Qed.
   
-#[export] Instance Cmul_AMonoid : AMonoid Cmul C1 eq.
+#[export] Instance Cmul_AMonoid : AMonoid eq Cmul C1.
 Proof. constructor; auto with C. Qed.
 
-(* #[export] Instance R_Order : Order Rlt Rle Rltb Rleb. *)
-(* Proof. *)
-(*   constructor; intros; try lra. *)
-(*   destruct (total_order_T a b) as [[H|H]|H]; auto. *)
-(*   apply Rltb_reflect. apply Rleb_reflect. *)
-(* Qed. *)
+Hint Resolve Cadd_AMonoid Cmul_AMonoid : C.
 
-(* #[export] Instance R_ARing : ARing Cadd R0 Ropp Cmul R1. *)
-(* Proof. *)
-(*   repeat constructor; intros; ring. *)
-(* Qed. *)
+(** Group *)
 
-(* #[export] Instance R_OrderedARing *)
-(*   : OrderedARing Cadd 0 Ropp Cmul 1 Rlt Rle Rltb Rleb. *)
-(* Proof. *)
-(*   constructor. apply R_ARing. apply R_Order. *)
-(*   - intros. lra. *)
-(*   - intros. apply Cmul_lt_compat_r; auto. *)
-(* Qed. *)
+#[export] Instance Cadd_Group : Group eq Cadd C0 Copp.
+Proof. constructor; auto with C. Qed.
 
-(* #[export] Instance R_Field : Field Cadd R0 Ropp Cmul R1 Cinv. *)
-(* Proof. *)
-(*   constructor. apply R_ARing. intros. field; auto. lra. *)
-(* Qed. *)
+Hint Resolve Cadd_Group : C.
 
-(* #[export] Instance R_OrderedField *)
-(*   : OrderedField Cadd 0 Ropp Cmul 1 Cinv Rlt Rle Rltb Rleb. *)
-(* Proof. *)
-(*   constructor. apply R_Field. apply R_OrderedARing. *)
-(* Qed. *)
+(** AGroup *)
+
+#[export] Instance Cadd_AGroup : AGroup eq Cadd C0 Copp.
+Proof. constructor; auto with C. Qed.
+
+Hint Resolve Cadd_AGroup : C.
+
+(** Ring *)
+
+#[export] Instance C_Ring : Ring eq Cadd C0 Copp Cmul C1.
+Proof. constructor; auto with C. Qed.
+
+Hint Resolve C_Ring : C.
+
+(** ARing *)
+
+#[export] Instance C_ARing : ARing eq Cadd C0 Copp Cmul C1.
+Proof. constructor; auto with C. Qed.
+
+Hint Resolve C_ARing : C.
+
+(** Field *)
+
+#[export] Instance C_Field : Field eq Cadd C0 Copp Cmul C1 Cinv.
+Proof. constructor; auto with C. Qed.
+
+Hint Resolve C_Field : C.
